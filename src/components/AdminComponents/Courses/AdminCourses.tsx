@@ -1,4 +1,4 @@
-import { Button, Dialog } from "@material-ui/core";
+import { Button, Dialog, Typography } from "@material-ui/core";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import { DataGrid, GridColDef } from "@material-ui/data-grid";
 import React, { useEffect, useState } from "react";
@@ -30,8 +30,21 @@ function AdminCourses(props: Props) {
     { field: "title", headerName: "Title", width: 200 },
     {
       field: "lecturerName",
-      headerName: "Lecturer Name",
+      headerName: "Lecturer",
       width: 250,
+
+      align: "left",
+    },
+    {
+      field: "studentCount",
+      headerName: "Student Count",
+      renderCell: (params) =>
+        params.row.students ? (
+          <Typography variant="body1">{params.row.students.length}</Typography>
+        ) : (
+          <Typography variant="body1">0</Typography>
+        ),
+      width: 180,
 
       align: "left",
     },
@@ -99,7 +112,7 @@ function AdminCourses(props: Props) {
           title="Courses"
         ></HeaderWithButton>
         <div className={classes.contentContainer}>
-          <div style={{ height: "100%", width: 660, userSelect: "none" }}>
+          <div style={{ height: "100%", width: 900, userSelect: "none" }}>
             <DataGrid
               rows={rows}
               columns={columns}
