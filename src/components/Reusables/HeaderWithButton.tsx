@@ -1,5 +1,6 @@
-import { Button, Typography } from "@material-ui/core";
+import { Button, IconButton, Typography } from "@material-ui/core";
 import makeStyles from "@material-ui/core/styles/makeStyles";
+import { ArrowBack } from "@material-ui/icons";
 import React from "react";
 import { IconType } from "react-icons";
 
@@ -9,19 +10,31 @@ interface Props {
     onClick: () => void;
     icon?: IconType;
   };
+  backButton?: boolean;
   title: string;
 }
 
 export default React.memo(HeaderWithButton);
 
 function HeaderWithButton(props: Props) {
-  const { button, title } = props;
+  const { button, title, backButton } = props;
 
   const classes = useStyles();
 
   return (
     <div className={classes.container}>
-      <Typography className={classes.title}>{title}</Typography>
+      <div className={classes.left}>
+        {backButton ? (
+          <IconButton
+            style={{
+              marginInline: 8,
+            }}
+          >
+            <ArrowBack />
+          </IconButton>
+        ) : null}
+        <Typography className={classes.title}>{title}</Typography>
+      </div>
       {button && (
         <Button
           className={classes.button}
@@ -59,5 +72,10 @@ const useStyles = makeStyles((theme) => ({
     minWidth: 140,
     maxWidth: "100%",
     marginInline: theme.spacing(2),
+  },
+  left: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
   },
 }));

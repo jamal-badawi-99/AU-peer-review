@@ -9,8 +9,26 @@ export interface MenuTab {
   icon: IconType;
 }
 
-export const STUDENT_LAYOUT_ROUTES: MenuTab[] = [];
-export const LECTURER_LAYOUT_ROUTES: MenuTab[] = [];
+export const STUDENT_LAYOUT_ROUTES: MenuTab[] = [
+  {
+    title: "Change Password",
+    path: "/change-password",
+    icon: MdPassword,
+  },
+];
+export const LECTURER_LAYOUT_ROUTES: MenuTab[] = [
+
+  {
+    title: "Courses",
+    path: "/lecturer-courses",
+    icon: BsBook,
+  },
+  {
+    title: "Change Password",
+    path: "/change-password",
+    icon: MdPassword,
+  },
+];
 
 export const ADMIN_LAYOUT_ROUTES: MenuTab[] = [
   {

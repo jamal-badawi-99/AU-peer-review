@@ -1,6 +1,6 @@
 export interface Courses {
   _id: string;
-  name: string;
+  title: string;
   lecturerId: string;
   lecturerName: string;
   students: string[];

@@ -1,5 +1,5 @@
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
   ADMIN_LAYOUT_ROUTES,
@@ -29,43 +29,43 @@ export default function AuthGuard({ children }: any) {
     }
   }, [user]);
 
-  const checkUserType = useCallback(() => {
-    const STUDENT_ROUTES = [
-      ...STUDENT_LAYOUT_ROUTES.map((tab) => {
-        return tab.path;
-      }),
-      "/",
-    ];
-    const ADMIN_ROUTES = [
-      ...ADMIN_LAYOUT_ROUTES.map((tab) => {
-        return tab.path;
-      }),
-      "/",
-    ];
-    const LECTURER_ROUTES = [
-      ...LECTURER_LAYOUT_ROUTES.map((tab) => {
-        return tab.path;
-      }),
-      "/",
-    ];
+  // const checkUserType = useCallback(() => {
+  //   const STUDENT_ROUTES = [
+  //     ...STUDENT_LAYOUT_ROUTES.map((tab) => {
+  //       return tab.path;
+  //     }),
+  //     "/",
+  //   ];
+  //   const ADMIN_ROUTES = [
+  //     ...ADMIN_LAYOUT_ROUTES.map((tab) => {
+  //       return tab.path;
+  //     }),
+  //     "/",
+  //   ];
+  //   const LECTURER_ROUTES = [
+  //     ...LECTURER_LAYOUT_ROUTES.map((tab) => {
+  //       return tab.path;
+  //     }),
+  //     "/",
+  //   ];
 
-    const NO_AUTH_ROUTES = ["/login", "/signup", "/forgot-password"];
+  //   const NO_AUTH_ROUTES = ["/login", "/signup", "/forgot-password"];
 
-    if (user?.userType === "student" && STUDENT_ROUTES.includes(pathname)) {
-      return false;
-    } else if (user?.userType === "admin" && ADMIN_ROUTES.includes(pathname)) {
-      return false;
-    } else if (
-      user?.userType === "lecturer" &&
-      LECTURER_ROUTES.includes(pathname)
-    ) {
-      return false;
-    } else if (NO_AUTH_ROUTES.includes(pathname)) {
-      return true;
-    } else {
-      return true;
-    }
-  }, [pathname, user?.userType]);
+  //   if (user?.userType === "student" && STUDENT_ROUTES.includes(pathname)) {
+  //     return false;
+  //   } else if (user?.userType === "admin" && ADMIN_ROUTES.includes(pathname)) {
+  //     return false;
+  //   } else if (
+  //     user?.userType === "lecturer" &&
+  //     LECTURER_ROUTES.includes(pathname)
+  //   ) {
+  //     return false;
+  //   } else if (NO_AUTH_ROUTES.includes(pathname)) {
+  //     return true;
+  //   } else {
+  //     return true;
+  //   }
+  // }, [pathname, user?.userType]);
 
   useEffect(() => {
     const NO_AUTH_ROUTES = ["/login", "/signup", "/forgot-password"];
@@ -74,7 +74,7 @@ export default function AuthGuard({ children }: any) {
       if (user) {
         setLoading(true);
 
-        if (checkUserType()) {
+        if (NO_AUTH_ROUTES.includes(pathname)) {
           navigate("/");
         }
         setLoading(false);
@@ -89,7 +89,7 @@ export default function AuthGuard({ children }: any) {
         }, 500);
       }
     });
-  }, [auth, checkUserType, navigate, pathname]);
+  }, [auth, navigate, pathname]);
 
   if (loading)
     return (

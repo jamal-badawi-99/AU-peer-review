@@ -113,13 +113,7 @@ function Login() {
             variant="body2"
             style={{ marginTop: 8 }}
           >
-            Don't have an account?{" "}
-            <Link
-              to="/signup"
-              style={{ cursor: "pointer", textDecoration: "none" }}
-            >
-              Sign Up
-            </Link>
+        
           </Typography>
           <Link
             to="/forgot-password"
