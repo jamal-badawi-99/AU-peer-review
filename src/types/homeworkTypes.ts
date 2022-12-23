@@ -1,4 +1,4 @@
-export interface Homeworks {
+export interface Assignments {
   _id: string;
   title: string;
   description: string;

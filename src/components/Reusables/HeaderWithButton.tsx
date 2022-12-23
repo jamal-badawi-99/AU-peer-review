@@ -3,6 +3,7 @@ import makeStyles from "@material-ui/core/styles/makeStyles";
 import { ArrowBack } from "@material-ui/icons";
 import React from "react";
 import { IconType } from "react-icons";
+import { useNavigate } from "react-router-dom";
 
 interface Props {
   button?: {
@@ -20,12 +21,17 @@ function HeaderWithButton(props: Props) {
   const { button, title, backButton } = props;
 
   const classes = useStyles();
+  const navigate = useNavigate();
+  const goBack = () => {
+    navigate(-1);
+  };
 
   return (
     <div className={classes.container}>
       <div className={classes.left}>
         {backButton ? (
           <IconButton
+            onClick={goBack}
             style={{
               marginInline: 8,
             }}

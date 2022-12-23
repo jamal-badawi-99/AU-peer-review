@@ -4,5 +4,5 @@ export interface Courses {
   lecturerId: string;
   lecturerName: string;
   students: string[];
-  homeworks?: string[];
+  assignments?: string[];
 }

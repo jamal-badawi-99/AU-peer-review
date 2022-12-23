@@ -1,18 +1,19 @@
-import { Typography } from "@material-ui/core";
+import { Tab, Tabs } from "@material-ui/core";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import React from "react";
 import { useLocation } from "react-router-dom";
 import { db } from "../../../firebase";
 import { Courses } from "../../../types/courseTypes";
-import { useUser } from "../../../utils/UserContext";
 import Loading from "../../Loading";
 import HeaderWithButton from "../../Reusables/HeaderWithButton";
+import TabPanel from "../../Reusables/TabPanel";
+import CourseAssignments from "./CourseAssignments";
+import CourseInfo from "./CourseInfo";
+import CourseStudents from "./CourseStudents";
 
 export default React.memo(LecturerCourseView);
 
 function LecturerCourseView() {
-  const user = useUser();
-  console.log("first");
   const classes = useStyles();
   const location = useLocation();
   const [course, setCourse] = React.useState<Courses | null>(null);
@@ -31,17 +32,35 @@ function LecturerCourseView() {
       });
   }, [location.pathname]);
 
+  const [value, setValue] = React.useState(0);
+  const handleChange = (event: React.ChangeEvent<{}>, newValue: number) => {
+    setValue(newValue);
+  };
+
   if (course === null) {
     return <Loading />;
   }
   return (
     <div className={classes.container}>
       <HeaderWithButton title={course.title} backButton />
-      <div className={classes.content}>
-        <Typography>{course.title}</Typography>
-        <Typography>{course.lecturerName}</Typography>
-        <Typography>{course.students ? course.students.length : 0}</Typography>
-      </div>
+      <Tabs
+        value={value}
+        onChange={handleChange}
+        classes={{ scroller: classes.scroller }}
+      >
+        <Tab label="Information" />
+        <Tab label="Students" />
+        <Tab label="Assignments" />
+      </Tabs>
+      <TabPanel value={value} index={0}>
+        <CourseInfo course={course} />
+      </TabPanel>
+      <TabPanel value={value} index={1}>
+        <CourseStudents course={course} />
+      </TabPanel>
+      <TabPanel value={value} index={2}>
+        <CourseAssignments course={course} />
+      </TabPanel>
     </div>
   );
 }
@@ -85,5 +104,11 @@ const useStyles = makeStyles((theme) => ({
     border: "1px solid #ccc",
     borderRadius: 4,
     marginBottom: theme.spacing(2),
+  },
+  scroller: {
+    width: "100%",
+    alignItems: "center",
+    justifyContent: "center",
+    display: "flex",
   },
 }));

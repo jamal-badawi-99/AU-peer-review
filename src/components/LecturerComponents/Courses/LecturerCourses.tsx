@@ -92,8 +92,10 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: "column",
     alignItems: "flex-start",
     padding: theme.spacing(2),
-    border: "1px solid #ccc",
+    border: "1px solid #e5e5e5",
     borderRadius: 4,
+    boxShadow: "0px 0px 10px 0px rgba(0,0,0,0.1)",
+
     marginBottom: theme.spacing(2),
   },
 }));
