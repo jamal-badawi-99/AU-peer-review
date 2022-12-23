@@ -50,6 +50,19 @@ function CourseAssignments(props: Props) {
       align: "left",
     },
     { field: "description", headerName: "Description", width: 200 },
+    {
+      field: "passingGrade",
+      headerName: "Passing Grade",
+      width: 124,
+      renderCell(params) {
+        const max = params.row.maxGrade;
+        const min = params.value;
+
+        return <Typography>{`${min} / ${max}`}</Typography>;
+      },
+      disableColumnMenu: true,
+      sortable: false,
+    },
 
     {
       field: "deadline",
@@ -72,6 +85,25 @@ function CourseAssignments(props: Props) {
   if (assignments.length === 0)
     return (
       <div className={classes.container}>
+        <Dialog
+          open={addAssignment}
+          onClose={closeAddAssignment}
+          classes={{ paper: classes.dialog }}
+        >
+          <AddAssignmentDialog
+            closeDialog={closeAddAssignment}
+            courseId={course._id}
+          />
+        </Dialog>
+        <Fab
+          onClick={openAddAssignment}
+          variant="extended"
+          style={{ width: 180, position: "absolute", bottom: 40, right: 40 }}
+          color="secondary"
+        >
+          <MdAdd size={22} />
+          Add Assignment
+        </Fab>
         <Typography style={{ marginTop: 24 }}>No Assignments</Typography>
       </div>
     );
@@ -97,7 +129,7 @@ function CourseAssignments(props: Props) {
         Add Assignment
       </Fab>
       <div className={classes.contentContainer}>
-        <div style={{ height: "100%", width: 660, userSelect: "none" }}>
+        <div style={{ height: "100%", width: 800, userSelect: "none" }}>
           <DataGrid
             rows={assignments}
             columns={columns}

@@ -42,12 +42,28 @@ function AddAssignmentDialog(props: Props) {
       title: "",
       description: "",
       course: courseId,
-      deadline: new Date(),
+      passingGrade: 0,
+      maxGrade: 0,
+      deadline: null,
     },
     validationSchema: Yup.object({
       title: Yup.string().required("Title is required"),
       description: Yup.string(),
       deadline: Yup.date().required("Deadline is required"),
+      passingGrade: Yup.number()
+        .required("Passing grade is required")
+        .min(1, "Passing grade must be greater than 0"),
+      maxGrade: Yup.number()
+
+        .required("Max grade is required")
+        .min(1, "Max grade must be greater than 0")
+        .test(
+          "passing",
+          "Passing grade must be less than max grade",
+          function (value) {
+            return this.parent.passingGrade < value!;
+          }
+        ),
     }),
     onSubmit: async (v, { setSubmitting }) => {
       return Promise.all(
@@ -72,6 +88,7 @@ function AddAssignmentDialog(props: Props) {
 
           .add({
             ...v,
+            deadline: new Date(v.deadline!),
             files: urls,
           })
           .then(async (docref) => {
@@ -131,6 +148,34 @@ function AddAssignmentDialog(props: Props) {
           onChange={formik.handleChange}
           type="text"
           value={formik.values.description}
+        />
+        <TextField
+          variant="standard"
+          error={Boolean(
+            formik.touched.passingGrade && formik.errors.passingGrade
+          )}
+          fullWidth
+          helperText={formik.touched.passingGrade && formik.errors.passingGrade}
+          label="Passing Grade"
+          margin="normal"
+          name="passingGrade"
+          onBlur={formik.handleBlur}
+          onChange={formik.handleChange}
+          type="number"
+          value={formik.values.passingGrade}
+        />
+        <TextField
+          variant="standard"
+          error={Boolean(formik.touched.maxGrade && formik.errors.maxGrade)}
+          fullWidth
+          helperText={formik.touched.maxGrade && formik.errors.maxGrade}
+          label="Max Grade"
+          margin="normal"
+          name="maxGrade"
+          onBlur={formik.handleBlur}
+          onChange={formik.handleChange}
+          type="number"
+          value={formik.values.maxGrade}
         />
 
         <DateTimePicker
