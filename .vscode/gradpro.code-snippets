@@ -1,0 +1,129 @@
+{
+  "Functional Componenet": {
+    "prefix": "gfc",
+    "body": [
+      "import makeStyles from '@material-ui/core/styles/makeStyles'",
+      "import React, { useEffect, useState } from 'react'",
+      "",
+      "interface Props {",
+      "",
+      "}",
+      "",
+      "export default React.memo(${1:$TM_FILENAME_BASE})",
+      "",
+      "function ${1:$TM_FILENAME_BASE} (props: Props) {",
+      "const {} = props",
+      "",
+      "\tconst classes = useStyles()",
+      "",
+      "\treturn (",
+      "\t\t<div className={classes.container}>",
+      "",
+      "\t\t</div>",
+      "\t)",
+      "}",
+      "",
+      "const useStyles = makeStyles((theme) => ({",
+      "\tcontainer: {",
+      "\t\tdisplay: 'flex',",
+      "\t\tflexDirection: 'column',",
+      "\t\theight: '100%',",
+      "\t\twidth: '100%',",
+      "\t\toverflow: 'hidden',",
+      "\t}",
+      "}))"
+    ]
+  },
+  "Div with classname.classes.": {
+    "prefix": "dvc",
+    "body": ["<div className={classes.${1:class}}>\n$2\n</div>$3"]
+  },
+  "tag with classname.classes.": {
+    "prefix": "ctag",
+    "body": ["<${1:tag} className={classes.${2:class}}>\n$3\n</${1:tag}>$4"]
+  },
+  "className": {
+    "prefix": "cla",
+    "body": ["className={classes.${1:class}}"]
+  },
+  "formik Template": {
+    "prefix": "useFormik",
+    "body": [
+      "const ${1:formik} = useFormik({\n\tinitialValues: {\n\n\t},\n\tvalidationSchema: ${2:schema},\n\tonSubmit: async (values) => {\n\t\treturn\n\t},\n})"
+    ]
+  },
+  "playground Template": {
+    "prefix": "plgr",
+    "body": ["use('test');\ndb."]
+  },
+  "useBoolean": {
+    "prefix": "useBoolean",
+    "body": ["const [${1:state},${2:open},${3:close}] = useBoolean()"]
+  },
+  "useAsync": {
+    "prefix": "useAsync",
+    "body": ["const [${1:load}] = useAsync(() => ${2:fn()})"]
+  },
+  "useLoading": {
+    "prefix": "useLoading",
+    "body": ["const [loading, setLoading, stopLoading] = useBoolean()"]
+  },
+  "Dialog Componenet": {
+    "prefix": "cdc",
+    "body": [
+      "import { IconButton, Typography } from '@material-ui/core'",
+      "import makeStyles from '@material-ui/core/styles/makeStyles'",
+      "import CloseIcon from '@material-ui/icons/Close'",
+      "import React from 'react'",
+      "",
+      "interface Props {",
+      "close: () => void",
+      "}",
+      "",
+      "export default React.memo(${1:$TM_FILENAME_BASE})",
+      "",
+      "function ${1:$TM_FILENAME_BASE} (props: Props) {",
+      "const {close} = props",
+      "",
+      "\tconst classes = useStyles()",
+      "",
+      "\treturn (",
+      "\t\t<div className={classes.container}>",
+      "\t\t\t<div className={classes.header}>",
+      "\t\t\t\t<Typography className={classes.title}>Title</Typography>",
+      "\t\t\t\t<IconButton onClick={close}>",
+      "\t\t\t\t\t<CloseIcon />",
+      "\t\t\t\t</IconButton>",
+      "\t\t\t</div>",
+      "\t\t</div>",
+      "\t)",
+      "}",
+      "",
+      "const useStyles = makeStyles((theme) => ({",
+      "\tcontainer: {",
+      "\t\tdisplay: 'flex',",
+      "\t\tflexDirection: 'column',",
+      "\t},",
+      "\theader: {",
+      "\t\tdisplay: 'flex',",
+      "\t\talignItems: 'center',",
+      "\t\tjustifyContent: 'space-between',",
+      "\t\theight: 72,",
+      "\t\tpadding: '0px 16px',",
+      "\t\tbackground: theme.palette.background.default,",
+      "\t\tborderBottom: `1px solid ${theme.palette.divider}`,",
+      "\t\tmarginBottom: 24,",
+      "\t},",
+      "\ttitle: {",
+      "\t\tfontWeight: 500,",
+      "\t\tfontSize: 20,",
+      "\t\tcolor: theme.palette.text.primary,",
+      "\t},",
+      "}))"
+    ]
+  },
+  "importYup": {
+    "prefix": "importYup",
+    "body": ["import * as Yup from 'yup'"]
+  }
+}
