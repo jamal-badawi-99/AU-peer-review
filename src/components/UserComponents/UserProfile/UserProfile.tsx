@@ -11,11 +11,9 @@ function UserProfile() {
 
   return (
     <div className={classes.container}>
-      <HeaderWithButton title={"Profile"} />
-      <div className={classes.content}>
-        <div className={classes.EditContent}>
-          <UserProfilePasswords />
-        </div>
+      <HeaderWithButton title={"Change Password"} />
+      <div className={classes.EditContent}>
+        <UserProfilePasswords />
       </div>
     </div>
   );
@@ -28,7 +26,7 @@ const useStyles = makeStyles((theme) => ({
     height: "100%",
     width: "100%",
     boxSizing: "border-box",
-
+    alignItems: "center",
     overflow: "hidden",
   },
   content: {
@@ -38,6 +36,7 @@ const useStyles = makeStyles((theme) => ({
     height: "100%",
     width: "100%",
     overflow: "hidden",
+    justifyContent: "center",
     boxSizing: "border-box",
   },
   profileCard: {
@@ -56,12 +55,10 @@ const useStyles = makeStyles((theme) => ({
   EditContent: {
     display: "flex",
     flexDirection: "column",
-    width: "100%",
+    width: 900,
+marginTop: theme.spacing(4),
     height: "96%",
     overflow: "auto",
-    marginInlineStart: theme.spacing(4),
-    marginInlineEnd: theme.spacing(32),
-    marginBotom: theme.spacing(4),
     boxSizing: "border-box",
     ...scrollBarStyle,
   },

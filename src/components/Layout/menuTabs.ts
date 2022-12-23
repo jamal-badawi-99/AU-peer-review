@@ -1,6 +1,7 @@
 import { IconType } from "react-icons";
 import { BsBook, BsPeople } from "react-icons/bs";
 import { FaChalkboardTeacher } from "react-icons/fa";
+import { MdPassword } from "react-icons/md";
 
 export interface MenuTab {
   title: string;
@@ -26,5 +27,10 @@ export const ADMIN_LAYOUT_ROUTES: MenuTab[] = [
     title: "Courses",
     path: "/admin-courses",
     icon: BsBook,
+  },
+  {
+    title: "Change Password",
+    path: "/change-password",
+    icon: MdPassword,
   },
 ];

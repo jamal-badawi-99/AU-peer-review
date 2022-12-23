@@ -56,8 +56,8 @@ function NavMenu(props: Props) {
             <Typography className={classes.nameTypography}>
               {user?.fullName}
             </Typography>
-            <Typography className={classes.nameTypography}>
-              {user._id}
+            <Typography className={classes.numberTypo}>
+              {user.number}
             </Typography>
           </div>
 
@@ -191,6 +191,13 @@ const useStyles = makeStyles((theme) => ({
     fontSize: 16,
     fontWeight: 500,
   },
+
+  numberTypo: {
+    display: "flex",
+    fontSize: 14,
+    color: theme.palette.text.secondary,
+  },
+
   typeTypography: {
     display: "flex",
     fontSize: 11,
