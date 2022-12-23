@@ -53,17 +53,17 @@ function CourseStudents(props: Props) {
   }
   return (
     <div className={classes.container}>
-    <div className={classes.contentContainer}>
-      <div style={{ height: "100%", width: 660, userSelect: "none" }}>
-        <DataGrid
-          rows={rows}
-          columns={columns}
-          classes={{ cell: classes.cell, columnHeader: classes.cell }}
-          pageSize={13}
-          showCellRightBorder
-          disableSelectionOnClick
-        />
-      </div>
+      <div className={classes.contentContainer}>
+        <div style={{ height: "100%", width: 660, userSelect: "none" }}>
+          <DataGrid
+            rows={rows}
+            columns={columns}
+            classes={{ cell: classes.cell, columnHeader: classes.cell }}
+            pageSize={13}
+            showCellRightBorder
+            disableSelectionOnClick
+          />
+        </div>
       </div>
     </div>
   );
@@ -158,6 +158,7 @@ const useStyles = makeStyles((theme) => ({
       background: theme.palette.success.dark,
     },
   },
+
   cell: {
     outline: "none !important",
   },

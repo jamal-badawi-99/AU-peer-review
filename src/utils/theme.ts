@@ -11,12 +11,6 @@ export const theme = createTheme({
   },
 
   overrides: {
-    MuiGrid: {
-      root: {
-        backgroundColor: "red",
-      },
-    },
-
     MuiFormControl: {
       marginNormal: {
         marginTop: 0,

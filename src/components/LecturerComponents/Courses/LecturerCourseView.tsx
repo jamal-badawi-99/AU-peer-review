@@ -21,8 +21,7 @@ function LecturerCourseView() {
     console.log(location.pathname);
     db.collection("courses")
       .doc(location.pathname.split("/")[2])
-      .get()
-      .then((snapshot) => {
+      .onSnapshot((snapshot) => {
         const data = {
           _id: snapshot.id,
           ...snapshot.data(),

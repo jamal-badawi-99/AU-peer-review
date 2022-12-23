@@ -7,4 +7,5 @@ export interface Submissions {
   comment?: string;
   gradedBy?: string[];
   gradedOthers?: string[];
+  objectionStatus?: "none" | "resolved" | "pending";
 }

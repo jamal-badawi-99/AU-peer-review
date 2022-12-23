@@ -3,7 +3,7 @@ export interface Assignments {
   title: string;
   description: string;
   course: string;
-  deadline: string;
+  deadline: Date;
   files?: string[];
   submissions?: string[];
 }
