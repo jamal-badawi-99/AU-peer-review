@@ -1,12 +1,14 @@
-import { Dialog } from "@material-ui/core";
+import { Button, Dialog } from "@material-ui/core";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import { DataGrid, GridColDef } from "@material-ui/data-grid";
 import React, { useEffect, useState } from "react";
 import { MdAdd } from "react-icons/md";
 import { db } from "../../../firebase";
+import useBoolean from "../../../hooks/useBoolean";
 import Loading from "../../Loading";
 import HeaderWithButton from "../../Reusables/HeaderWithButton";
 import AddCourseDialogContent from "./AddCourseDialogContent";
+import ManageCourseDialogContent from "./ManageCourseDialogContent";
 
 interface Props {}
 
@@ -14,44 +16,54 @@ export default React.memo(AdminCourses);
 
 function AdminCourses(props: Props) {
   const classes = useStyles();
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const openDialog = () => {
-    setDialogOpen(true);
-  };
 
-  const closeDialog = () => {
-    setDialogOpen(false);
+  const [dialogOpen, openDialog, closeDialog] = useBoolean();
+
+  const [idToManage, setIdToManage] = useState<string | null>(null);
+  const [manageOpen, openManage, closeManage] = useBoolean();
+  const handleManage = (id: string) => {
+    setIdToManage(id);
+    openManage();
   };
 
   const columns: GridColDef[] = [
+    { field: "title", headerName: "Title", width: 200 },
     {
-      field: "number",
-      headerName: "Username",
-      width: 150,
+      field: "lecturerName",
+      headerName: "Lecturer Name",
+      width: 250,
 
       align: "left",
     },
-    { field: "fullName", headerName: "Full Name", width: 200 },
 
     {
-      field: "email",
-      headerName: "Email",
-
-      width: 250,
+      field: "manage",
+      headerName: "Manage",
+      //button
+      renderCell: (params) => (
+        <Button
+          color="secondary"
+          variant="contained"
+          onClick={() => handleManage(params.row.id)}
+        >
+          Manage
+        </Button>
+      ),
+      width: 100,
       align: "left",
+      sortable: false,
+      disableColumnMenu: true,
     },
   ];
   const [rows, setRows] = useState<any>(null);
   useEffect(() => {
-    db.collection("users")
-      .where("userType", "==", "course")
-      .onSnapshot((snap) => {
-        const data = snap.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setRows(data);
-      });
+    db.collection("courses").onSnapshot((snap) => {
+      const data = snap.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setRows(data);
+    });
   }, []);
 
   if (!rows) {
@@ -65,6 +77,16 @@ function AdminCourses(props: Props) {
         classes={{ paper: classes.dialog }}
       >
         <AddCourseDialogContent closeDialog={closeDialog} />
+      </Dialog>
+      <Dialog
+        open={manageOpen}
+        onClose={closeManage}
+        classes={{ paper: classes.dialog }}
+      >
+        <ManageCourseDialogContent
+          closeDialog={closeManage}
+          courseId={idToManage!}
+        />
       </Dialog>
 
       <div className={classes.container}>

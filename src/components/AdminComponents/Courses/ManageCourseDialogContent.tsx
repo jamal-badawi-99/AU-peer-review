@@ -14,19 +14,22 @@ import * as Yup from "yup";
 import { db } from "../../../firebase";
 import { Users } from "../../../types/userTypes";
 import { useSnackBar } from "../../../utils/SnackbarContext";
+import Loading from "../../Loading";
 
 interface Props {
   closeDialog: () => void;
+  courseId: string;
 }
 
-export default React.memo(AddCourseDialogContent);
+export default React.memo(ManageCourseDialogContent);
 
-function AddCourseDialogContent(props: Props) {
-  const { closeDialog } = props;
+function ManageCourseDialogContent(props: Props) {
+  const { closeDialog, courseId } = props;
 
   const classes = useStyles();
   const alert = useSnackBar();
-  const [lecturers, setLecturers] = React.useState<Users[]>([]);
+  const [lecturers, setLecturers] = React.useState<Users[] | null>(null);
+  const [students, setStudents] = React.useState<Users[] | null>(null);
   React.useEffect(() => {
     db.collection("users")
       .where("userType", "==", "lecturer")
@@ -38,12 +41,33 @@ function AddCourseDialogContent(props: Props) {
         });
         setLecturers(lecturers);
       });
-  }, []);
+    db.collection("users")
+      .where("userType", "==", "student")
+      .get()
+      .then((querySnapshot) => {
+        const students: Users[] = [];
+        querySnapshot.forEach((doc) => {
+          students.push({ _id: doc.id, ...doc.data() } as Users);
+        });
+        setStudents(students);
+      });
+    db.collection("courses")
+      .doc(courseId)
+      .get()
+      .then((doc) => {
+        formik.setValues({
+          title: doc.data()?.title,
+          lecturer: doc.data()?.lecturerId,
+          students: doc.data()?.students ?? [],
+        });
+      });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [courseId]);
 
   const formik = useFormik({
     initialValues: {
       title: "",
-
+      students: [],
       lecturer: "",
     },
     validationSchema: Yup.object({
@@ -52,10 +76,12 @@ function AddCourseDialogContent(props: Props) {
     }),
     onSubmit: (v) => {
       db.collection("courses")
-        .add({
+        .doc(courseId)
+        .update({
           title: v.title,
           lecturerId: v.lecturer,
-          lecturerName: lecturers.find((l) => l._id === v.lecturer)?.fullName,
+          lecturerName: lecturers!.find((l) => l._id === v.lecturer)?.fullName,
+          students: v.students,
         })
         .then(() => {
           alert.show("Course created", "success");
@@ -73,10 +99,22 @@ function AddCourseDialogContent(props: Props) {
         });
     },
   });
+
+  const handleChange = (event: any) => {
+    const {
+      target: { value },
+    } = event;
+    formik.setFieldValue(
+      "students",
+      typeof value === "string" ? value.split(",") : value
+    );
+  };
+  if (lecturers === null || formik.values.lecturer === "" || students === null)
+    return <Loading />;
   return (
     <>
       <div className={classes.dialogTitleContainer}>
-        <Typography className={classes.dialogTitle}>Add Course</Typography>
+        <Typography className={classes.dialogTitle}>Manage Course</Typography>
         <IconButton onClick={closeDialog}>
           <MdClose />
         </IconButton>
@@ -117,6 +155,32 @@ function AddCourseDialogContent(props: Props) {
             );
           })}
         </TextField>
+        <TextField
+          variant="standard"
+          select
+          label="Students"
+          name="students"
+          error={
+            formik.touched.students && formik.errors.students ? true : false
+          }
+          focused={formik.touched.students ? true : false}
+          onBlur={formik.handleBlur}
+          type="text"
+          value={formik.values.students}
+          SelectProps={{
+            multiple: true,
+            value: formik.values.students,
+            onChange: handleChange,
+          }}
+        >
+          {students.map((s) => {
+            return (
+              <MenuItem key={s._id} value={s._id}>
+                {s.fullName}
+              </MenuItem>
+            );
+          })}
+        </TextField>
         <div className={classes.dialogActions}>
           {!formik.isSubmitting ? (
             <Button
@@ -126,7 +190,7 @@ function AddCourseDialogContent(props: Props) {
               type="submit"
               disabled={formik.isSubmitting}
             >
-              Add
+              Submit
             </Button>
           ) : (
             <CircularProgress
