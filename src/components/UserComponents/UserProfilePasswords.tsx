@@ -4,8 +4,8 @@ import { useFormik } from "formik";
 import React from "react";
 import { RiLockPasswordLine } from "react-icons/ri";
 import * as Yup from "yup";
-import { auth } from "../../../firebase";
-import { useSnackBar } from "../../../utils/SnackbarContext";
+import { auth } from "../../firebase";
+import { useSnackBar } from "../../utils/SnackbarContext";
 
 export default React.memo(UserProfilePasswords);
 

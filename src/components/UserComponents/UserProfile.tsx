@@ -1,13 +1,11 @@
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import React from "react";
-import { useUser } from "../../../utils/UserContext";
-import HeaderWithButton from "../../Reusables/HeaderWithButton";
+import HeaderWithButton from "../Reusables/HeaderWithButton";
 import UserProfilePasswords from "./UserProfilePasswords";
 export default React.memo(UserProfile);
 
 function UserProfile() {
   const classes = useStyles();
-  const user = useUser();
 
   return (
     <div className={classes.container}>
@@ -56,7 +54,7 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     flexDirection: "column",
     width: 900,
-marginTop: theme.spacing(4),
+    marginTop: theme.spacing(4),
     height: "96%",
     overflow: "auto",
     boxSizing: "border-box",

@@ -20,33 +20,49 @@ export async function accountCreator(props: Props) {
   };
   var secondaryApp = firebase.initializeApp(firebaseConfig, "Secondary");
   const pass = generatePassword();
+
   await secondaryApp
     .auth()
     .createUserWithEmailAndPassword(props.email, pass)
     .then(async (a) => {
       await db
         .collection("users")
-        .doc(a.user?.uid)
-        .set({
-          fullName: props.fullName,
-          email: props.email,
-          userType: props.userType,
-          number: props.username,
+        .where("number", "==", props.username)
+        .get()
+        .then(async (querySnapshot) => {
+          if (querySnapshot.docs.length > 0) {
+            throw new Error("User already exists");
+          } else {
+            await db
+              .collection("users")
+              .doc(a.user?.uid)
+              .set({
+                fullName: props.fullName,
+                email: props.email,
+                userType: props.userType,
+                number: props.username,
+              })
+              .then(async () => {
+                await emailjs.send(
+                  "service_f4o7j2r",
+                  "template_ftr5nmc",
+                  {
+                    sendTo: props.email,
+                    pass: pass,
+                  },
+                  "GUb3iWN1Xmonq1G-p"
+                );
+              });
+          }
         })
-        .then(async () => {
-          await emailjs.send(
-            "service_f4o7j2r",
-            "template_ftr5nmc",
-            {
-              sendTo: props.email,
-              pass: pass,
-            },
-            "GUb3iWN1Xmonq1G-p"
-          );
+        .catch((err) => {
+          throw err.message;
         });
     })
     .catch((err) => {
-      console.log(err);
+      if (err === "User already exists") {
+        throw err;
+      }
       throw err.code;
     });
 

@@ -3,20 +3,18 @@ import makeStyles from "@material-ui/core/styles/makeStyles";
 import { DataGrid, GridColDef } from "@material-ui/data-grid";
 import React, { useEffect, useState } from "react";
 import { MdAdd } from "react-icons/md";
-import { db } from "../../firebase";
-import { useSnackBar } from "../../utils/SnackbarContext";
-import Loading from "../Loading";
-import HeaderWithButton from "../Reusables/HeaderWithButton";
-import AddLecturerDialogContent from "./AddLecturerDialogContent";
+import { db } from "../../../firebase";
+import Loading from "../../Loading";
+import HeaderWithButton from "../../Reusables/HeaderWithButton";
+import AddStudentDialogContent from "./AddStudentDialogContent";
 
 interface Props {}
 
-export default React.memo(AdminLecturers);
+export default React.memo(AdminStudents);
 
-function AdminLecturers(props: Props) {
+function AdminStudents(props: Props) {
   const classes = useStyles();
   const [dialogOpen, setDialogOpen] = useState(false);
-  const alert = useSnackBar();
   const openDialog = () => {
     setDialogOpen(true);
   };
@@ -28,8 +26,8 @@ function AdminLecturers(props: Props) {
   const columns: GridColDef[] = [
     {
       field: "number",
-      headerName: "Username",
-      width: 150,
+      headerName: "Student Number",
+      width: 200,
 
       align: "left",
     },
@@ -46,7 +44,7 @@ function AdminLecturers(props: Props) {
   const [rows, setRows] = useState<any>(null);
   useEffect(() => {
     db.collection("users")
-      .where("userType", "==", "lecturer")
+      .where("userType", "==", "student")
       .onSnapshot((snap) => {
         const data = snap.docs.map((doc) => ({
           id: doc.id,
@@ -66,17 +64,17 @@ function AdminLecturers(props: Props) {
         onClose={closeDialog}
         classes={{ paper: classes.dialog }}
       >
-        <AddLecturerDialogContent closeDialog={closeDialog} />
+        <AddStudentDialogContent closeDialog={closeDialog} />
       </Dialog>
 
       <div className={classes.container}>
         <HeaderWithButton
           button={{
-            text: "Add Lecturer",
+            text: "Add Student",
             icon: MdAdd,
             onClick: openDialog,
           }}
-          title="Lecturers"
+          title="Students"
         ></HeaderWithButton>
         <div className={classes.contentContainer}>
           <div style={{ height: "100%", width: 660, userSelect: "none" }}>

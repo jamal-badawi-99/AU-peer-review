@@ -10,43 +10,53 @@ import { useFormik } from "formik";
 import React from "react";
 import { MdClose } from "react-icons/md";
 import * as Yup from "yup";
-import { accountCreator } from "../../utils/AccountCreator";
-import { useSnackBar } from "../../utils/SnackbarContext";
+import { db } from "../../../firebase";
+import { Users } from "../../../types/userTypes";
+import { useSnackBar } from "../../../utils/SnackbarContext";
 
 interface Props {
   closeDialog: () => void;
 }
 
-export default React.memo(AddLecturerDialogContent);
+export default React.memo(AddCourseDialogContent);
 
-function AddLecturerDialogContent(props: Props) {
+function AddCourseDialogContent(props: Props) {
   const { closeDialog } = props;
 
   const classes = useStyles();
   const alert = useSnackBar();
+  const [lecturers, setLecturers] = React.useState<Users[]>([]);
+  React.useEffect(() => {
+    db.collection("users")
+      .where("userType", "==", "lecturer")
+      .get()
+      .then((querySnapshot) => {
+        const lecturers: Users[] = [];
+        querySnapshot.forEach((doc) => {
+          lecturers.push({ _id: doc.id, ...doc.data() } as Users);
+        });
+        setLecturers(lecturers);
+      });
+  }, []);
+
   const formik = useFormik({
     initialValues: {
-      fullName: "",
-      email: "",
-      username: "",
+      title: "",
+
+      lecturer: "",
     },
     validationSchema: Yup.object({
-      email: Yup.string()
-        .email("Must be a valid email")
-        .max(255)
-        .required("Email is required"),
-      fullName: Yup.string().max(255).required("Lecturer name is required"),
-      username: Yup.string().required("Username is required"),
+      title: Yup.string().max(255).required("Course title is required"),
+      lecturer: Yup.string().required("Lecturer is required"),
     }),
     onSubmit: (v) => {
-      accountCreator({
-        email: v.email,
-        fullName: v.fullName,
-        username: v.username,
-        userType: "lecturer",
-      })
+      db.collection("courses")
+        .add({
+          title: v.title,
+          lecturer: v.lecturer,
+        })
         .then(() => {
-          alert.show("Lecturer created", "success");
+          alert.show("Course created", "success");
           formik.setSubmitting(false);
           closeDialog();
         })
@@ -61,11 +71,10 @@ function AddLecturerDialogContent(props: Props) {
         });
     },
   });
-  console.log(formik.values);
   return (
     <>
       <div className={classes.dialogTitleContainer}>
-        <Typography className={classes.dialogTitle}>Add Lecturer</Typography>
+        <Typography className={classes.dialogTitle}>Add Course</Typography>
         <IconButton onClick={closeDialog}>
           <MdClose />
         </IconButton>
@@ -73,43 +82,16 @@ function AddLecturerDialogContent(props: Props) {
       <form className={classes.dialogContent} onSubmit={formik.handleSubmit}>
         <TextField
           variant="standard"
-          error={Boolean(formik.touched.fullName && formik.errors.fullName)}
+          error={Boolean(formik.touched.title && formik.errors.title)}
           fullWidth
-          helperText={formik.touched.fullName && formik.errors.fullName}
+          helperText={formik.touched.title && formik.errors.title}
           label="Full Name"
           margin="normal"
-          name="fullName"
+          name="title"
           onBlur={formik.handleBlur}
           onChange={formik.handleChange}
           type="text"
-          value={formik.values.fullName}
-        />
-
-        <TextField
-          variant="standard"
-          error={Boolean(formik.touched.email && formik.errors.email)}
-          fullWidth
-          helperText={formik.touched.email && formik.errors.email}
-          label="Email"
-          margin="normal"
-          name="email"
-          onBlur={formik.handleBlur}
-          onChange={formik.handleChange}
-          type="email"
-          value={formik.values.email}
-        />
-        <TextField
-          variant="standard"
-          error={Boolean(formik.touched.username && formik.errors.username)}
-          fullWidth
-          helperText={formik.touched.username && formik.errors.username}
-          label="Username"
-          margin="normal"
-          name="username"
-          onBlur={formik.handleBlur}
-          onChange={formik.handleChange}
-          type="text"
-          value={formik.values.username}
+          value={formik.values.title}
         />
 
         <div className={classes.dialogActions}>
