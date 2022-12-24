@@ -77,19 +77,19 @@ export default function AuthGuard({ children }: any) {
         }
         if (
           userInfo?.userType === "student" &&
-          (pathname.includes("admin") || pathname.includes("lecturer"))
+          (pathname.startsWith("admin") || pathname.startsWith("lecturer"))
         ) {
           navigate("/");
         }
         if (
           userInfo?.userType === "admin" &&
-          (pathname.includes("student") || pathname.includes("lecturer"))
+          (pathname.startsWith("student") || pathname.startsWith("lecturer"))
         ) {
           navigate("/");
         }
         if (
           userInfo?.userType === "lecturer" &&
-          (pathname.includes("student") || pathname.includes("admin"))
+          (pathname.startsWith("student") || pathname.startsWith("admin"))
         ) {
           navigate("/");
         }
