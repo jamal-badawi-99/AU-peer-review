@@ -6,6 +6,8 @@ import ForgotPassword from "./components/ForgotPassword";
 import LecturerCourses from "./components/LecturerComponents/Courses/LecturerCourses";
 import LecturerCourseView from "./components/LecturerComponents/Courses/LecturerCourseView";
 import Login from "./components/Login";
+import StudentCourses from "./components/StudentComponents/Courses/StudentCourses";
+import StudentCourseTabsView from "./components/StudentComponents/Courses/StudentCourseTabsView";
 import UserProfile from "./components/UserComponents/UserProfile";
 import AuthGuard from "./utils/AuthGuard";
 
@@ -22,12 +24,20 @@ function Router() {
           <Route path="/admin-lecturers" element={<AdminLecturers />} />
           <Route path="/admin-students" element={<AdminStudents />} />
           <Route path="/admin-courses" element={<AdminCourses />} />
+
+          
           <Route path="/change-password" element={<UserProfile />} />
 
           <Route path="/lecturer-courses" element={<LecturerCourses />} />
           <Route
             path="/lecturer-courses/:courseId"
             element={<LecturerCourseView />}
+          />
+
+          <Route path="/student-courses" element={<StudentCourses />} />
+          <Route
+            path="/student-courses/:courseId"
+            element={<StudentCourseTabsView />}
           />
         </Routes>
       </AuthGuard>

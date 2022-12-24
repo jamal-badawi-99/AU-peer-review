@@ -11,13 +11,17 @@ export interface MenuTab {
 
 export const STUDENT_LAYOUT_ROUTES: MenuTab[] = [
   {
+    title: "Courses",
+    path: "/student-courses",
+    icon: BsBook,
+  },
+  {
     title: "Change Password",
     path: "/change-password",
     icon: MdPassword,
   },
 ];
 export const LECTURER_LAYOUT_ROUTES: MenuTab[] = [
-
   {
     title: "Courses",
     path: "/lecturer-courses",

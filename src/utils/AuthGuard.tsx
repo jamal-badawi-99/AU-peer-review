@@ -16,18 +16,18 @@ export default function AuthGuard({ children }: any) {
   const navigate = useNavigate();
   const [loading, setLoading] = React.useState(true);
   const { pathname } = useLocation();
-  const user = useUser();
+  const userInfo = useUser();
   const [tabs, setTabs] = useState<MenuTab[] | undefined>();
   useEffect(() => {
-    console.log(user);
-    if (user?.userType === "admin") {
+    console.log(userInfo);
+    if (userInfo?.userType === "admin") {
       setTabs(ADMIN_LAYOUT_ROUTES);
-    } else if (user?.userType === "lecturer") {
+    } else if (userInfo?.userType === "lecturer") {
       setTabs(LECTURER_LAYOUT_ROUTES);
-    } else if (user?.userType === "student") {
+    } else if (userInfo?.userType === "student") {
       setTabs(STUDENT_LAYOUT_ROUTES);
     }
-  }, [user]);
+  }, [userInfo]);
 
   // const checkUserType = useCallback(() => {
   //   const STUDENT_ROUTES = [
@@ -73,10 +73,28 @@ export default function AuthGuard({ children }: any) {
     onAuthStateChanged(auth, (user) => {
       if (user) {
         setLoading(true);
-
         if (NO_AUTH_ROUTES.includes(pathname)) {
           navigate("/");
         }
+        if (
+          userInfo?.userType === "student" &&
+          (pathname.includes("admin") || pathname.includes("lecturer"))
+        ) {
+          navigate("/");
+        }
+        if (
+          userInfo?.userType === "admin" &&
+          (pathname.includes("student") || pathname.includes("lecturer"))
+        ) {
+          navigate("/");
+        }
+        if (
+          userInfo?.userType === "lecturer" &&
+          (pathname.includes("student") || pathname.includes("admin"))
+        ) {
+          navigate("/");
+        }
+
         setLoading(false);
       } else {
         if (NO_AUTH_ROUTES.includes(pathname)) {
@@ -89,7 +107,7 @@ export default function AuthGuard({ children }: any) {
         }, 500);
       }
     });
-  }, [auth, navigate, pathname]);
+  }, [auth, navigate, pathname, userInfo?.userType]);
 
   if (loading)
     return (
@@ -97,7 +115,7 @@ export default function AuthGuard({ children }: any) {
         <Loading />
       </div>
     );
-  if (!user) return null;
+  if (!userInfo) return null;
   return (
     <div style={{ display: "flex", flexDirection: "row", height: "100vh" }}>
       <NavMenu tabs={tabs} />

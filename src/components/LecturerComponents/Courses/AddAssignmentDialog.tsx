@@ -179,8 +179,8 @@ function AddAssignmentDialog(props: Props) {
         />
 
         <DateTimePicker
-          disableFuture
-          openTo="year"
+          
+
           ampm={false}
           TextFieldComponent={(props) => (
             <TextField
