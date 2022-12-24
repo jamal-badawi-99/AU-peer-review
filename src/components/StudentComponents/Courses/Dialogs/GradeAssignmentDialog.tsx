@@ -56,7 +56,6 @@ function GradeAssignmentDialog(props: Props) {
       ? assignment.whoGraded![user._id].length
       : 0
     : 0;
-  console.log(whog);
   const grade = submission.grades
     .map((x) => {
       return x.grade;

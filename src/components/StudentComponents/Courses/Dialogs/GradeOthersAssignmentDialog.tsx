@@ -92,8 +92,6 @@ function GradeOthersAssignmentDialog(props: Props) {
                 grade: grade?.grade ?? 0,
               });
             }
-            console.log(gradingData);
-            // setBank((prev) => prev + (grade?.grade ?? 0));
             submissions.push({ ...data, _id });
           } else {
             idsToDelete.push(id);
@@ -111,6 +109,7 @@ function GradeOthersAssignmentDialog(props: Props) {
             });
         }
       });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [assignment._id, assignment.whoGrades, user._id]);
 
   if (!assignment || !submissions) return <Loading />;
@@ -174,7 +173,17 @@ function GradeOthersAssignmentDialog(props: Props) {
                   })}
                 </div>
                 {sub.grades.find((grade) => grade.gradedBy === user._id) ? (
-                  <Typography>Graded</Typography>
+                  <Typography
+                    style={{
+                      width: "100%",
+                      textAlign: "center",
+                      marginTop: 8,
+                      fontSize: 20,
+                      fontWeight: 600,
+                    }}
+                  >
+                    Graded
+                  </Typography>
                 ) : (
                   <div className={classes.studentActionsContainer}>
                     <TextField
