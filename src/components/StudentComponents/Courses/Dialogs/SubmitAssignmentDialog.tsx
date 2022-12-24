@@ -67,7 +67,7 @@ function SubmitAssignmentDialog(props: Props) {
           await db
             .collection("submissions")
 
-            .add({ ...v, files: urls, grades: [], studentsGraded: [] });
+            .add({ ...v, files: urls, grades: [] });
         })
         .then(() => {
           snackBar.show("Submitted Assignment", "success");
@@ -114,7 +114,6 @@ function SubmitAssignmentDialog(props: Props) {
           <Typography className={classes.additionalLabel}>
             Additional Files
           </Typography>
-    
         </div>
         <FormHelperText
           error={Boolean(formik.touched.files && formik.errors.files)}

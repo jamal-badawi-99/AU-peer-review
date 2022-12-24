@@ -9,4 +9,6 @@ export interface Assignments {
   submissions?: string[];
   passingGrade: number;
   maxGrade: number;
+  whoGrades?: { [key: string]: string[] };
+  whoGraded?: { [key: string]: string[] };
 }

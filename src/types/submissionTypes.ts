@@ -6,7 +6,6 @@ export interface Submissions {
   files?: string[];
   note?: string;
   grades: Grades[];
-  studentsGraded?: string[];
   objectionStatus?: "none" | "resolved" | "pending";
 }
 

@@ -14,6 +14,7 @@ import { useUser } from "../../../utils/UserContext";
 import Loading from "../../Loading";
 import DetailsAssignmentDialog from "./Dialogs/DetailsAssignmentDialog";
 import GradeAssignmentDialog from "./Dialogs/GradeAssignmentDialog";
+import GradeOthersAssignmentDialog from "./Dialogs/GradeOthersAssignmentDialog";
 import SubmitAssignmentDialog from "./Dialogs/SubmitAssignmentDialog";
 
 interface Props {
@@ -27,6 +28,7 @@ function StudentsCourseAssignments(props: Props) {
   const user = useUser();
   const classes = useStyles();
   const [assignmentId, setAssignmentId] = React.useState<string | null>(null);
+  const [assignment, setAssignment] = React.useState<Assignments | null>(null);
   const [submissionId, setSubmissionId] = React.useState<string | null>(null);
   const [submitOpen, openSubmit, closeSubmit] = useBoolean();
   const setSubmitOpen = (id: string) => {
@@ -43,6 +45,11 @@ function StudentsCourseAssignments(props: Props) {
   const setDetailsOpen = (id: string) => {
     setAssignmentId(id);
     openDetails();
+  };
+  const [gradeOthersOpen, openGradeOthers, closeGradeOthers] = useBoolean();
+  const setGradeOthersOpen = (assignment: Assignments) => {
+    setAssignment(assignment);
+    openGradeOthers();
   };
   const [assignments, setAssignments] = React.useState<Assignments[]>([]);
   const [submissions, setSubmissions] = React.useState<Submissions[]>([]);
@@ -126,7 +133,8 @@ function StudentsCourseAssignments(props: Props) {
         const isSubmitted = submissions.some(
           (submission) => submission.assignment === params.row._id
         );
-        if (isSubmitted)
+
+        if (isSubmitted) {
           return (
             <Typography
               style={{
@@ -137,16 +145,58 @@ function StudentsCourseAssignments(props: Props) {
               Submitted
             </Typography>
           );
-        const isDisabled = moment().isAfter(date);
+        }
+        const isOverdue = moment().isAfter(date);
+        if (isOverdue) {
+          return (
+            <Typography
+              style={{
+                fontSize: 16,
+                fontWeight: 600,
+                color: "red",
+              }}
+            >
+              Overdue
+            </Typography>
+          );
+        }
         return (
           <Button
             variant="contained"
             color="secondary"
-            disabled={isDisabled}
             fullWidth
             onClick={() => setSubmitOpen(params.row._id)}
           >
             Submit
+          </Button>
+        );
+      },
+      type: "date",
+      width: 160,
+      align: "center",
+    },
+    {
+      field: "gradeOthers",
+      headerName: "Grade Other Students",
+      renderCell(params) {
+        const assignment = assignments.find(
+          (assignment) => assignment._id === params.row._id
+        );
+
+        const date = params.row.deadline;
+        const isOverdue = moment().isAfter(date);
+        if (!isOverdue) {
+          return null;
+        }
+
+        return (
+          <Button
+            variant="contained"
+            color="secondary"
+            onClick={() => setGradeOthersOpen(assignment!)}
+            fullWidth
+          >
+            Grade Others
           </Button>
         );
       },
@@ -161,6 +211,12 @@ function StudentsCourseAssignments(props: Props) {
         const submission = submissions.find(
           (submission) => submission.assignment === params.row._id
         );
+        const date = params.row.deadline;
+
+        const isOverdue = moment().isAfter(date);
+        if (!isOverdue) {
+          return null;
+        }
         if (!submission)
           return (
             <Typography
@@ -177,7 +233,7 @@ function StudentsCourseAssignments(props: Props) {
           <Button
             variant="contained"
             color="primary"
-            onClick={() => setGradeOpen(params.row._id,submission._id)}
+            onClick={() => setGradeOpen(params.row._id, submission._id)}
             fullWidth
           >
             View Grade
@@ -230,8 +286,18 @@ function StudentsCourseAssignments(props: Props) {
           onClose={closeGrade}
         />
       </Dialog>
+      <Dialog
+        open={gradeOthersOpen}
+        onClose={closeGradeOthers}
+        classes={{ paper: classes.dialog }}
+      >
+        <GradeOthersAssignmentDialog
+          assignment={assignment!}
+          onClose={closeGradeOthers}
+        />
+      </Dialog>
       <div className={classes.contentContainer}>
-        <div style={{ height: "100%", width: 940, userSelect: "none" }}>
+        <div style={{ height: "100%", width: 1100, userSelect: "none" }}>
           <DataGrid
             rows={assignments}
             columns={columns}

@@ -1,12 +1,10 @@
 import { IconButton, Typography } from "@material-ui/core";
 import makeStyles from "@material-ui/core/styles/makeStyles";
-import { Timestamp } from "firebase/firestore";
 import React, { useEffect } from "react";
 import { MdClose } from "react-icons/md";
 import { db } from "../../../../firebase";
 import { Assignments } from "../../../../types/assignmentTypes";
 import { Submissions } from "../../../../types/submissionTypes";
-import { useSnackBar } from "../../../../utils/SnackbarContext";
 import { useUser } from "../../../../utils/UserContext";
 import Loading from "../../../Loading";
 import { scrollBarStyle } from "../../../UserComponents/UserProfile";
@@ -22,34 +20,28 @@ function GradeAssignmentDialog(props: Props) {
   const { assignmentId, onClose, submissionId } = props;
 
   const classes = useStyles();
-  const snackBar = useSnackBar();
   const user = useUser();
   const [assignment, setAssignment] = React.useState<Assignments | null>(null);
-  const [submissions, setSubmissions] = React.useState<Submissions[] | null>(
-    null
-  );
+  const [submission, setSubmission] = React.useState<Submissions | null>(null);
 
   useEffect(() => {
     const unsub = db
+      .collection("submissions")
+      .doc(submissionId)
+      .onSnapshot((doc) => {
+        if (doc.exists) {
+          const data = doc.data() as Submissions;
+          setSubmission(data);
+        }
+      });
+    const unsub2 = db
       .collection("assignments")
       .doc(assignmentId)
       .onSnapshot((doc) => {
         if (doc.exists) {
           const data = doc.data() as Assignments;
-          const date = data.deadline as unknown as Timestamp;
-          data.deadline = date.toDate();
           setAssignment(data);
         }
-      });
-    const unsub2 = db
-      .collection("submissions")
-      .where("assignmentId", "==", assignmentId)
-      .onSnapshot((querySnapshot) => {
-        const data = querySnapshot.docs.map((doc) => {
-          const data = doc.data() as Submissions;
-          return data;
-        });
-        setSubmissions(data);
       });
 
     return () => {
@@ -58,7 +50,18 @@ function GradeAssignmentDialog(props: Props) {
     };
   }, [assignmentId, submissionId]);
 
-  if (!assignment || !submissions) return <Loading />;
+  if (!submission || !assignment) return <Loading />;
+  const whog = assignment.whoGraded
+    ? assignment.whoGraded![user._id]
+      ? assignment.whoGraded![user._id].length
+      : 0
+    : 0;
+  console.log(whog);
+  const grade = submission.grades
+    .map((x) => {
+      return x.grade;
+    })
+    .reduce((a, b) => a + b, 0);
   return (
     <>
       <div className={classes.dialogTitleContainer}>
@@ -69,7 +72,49 @@ function GradeAssignmentDialog(props: Props) {
           <MdClose />
         </IconButton>
       </div>
-      <div className={classes.dialogContent}></div>
+      {assignment.whoGrades![user._id].length! === whog ? (
+        submission.grades.length !== assignment.amount ? (
+          <div className={classes.dialogContent}>
+            <div className={classes.noGradeContainer}>
+              <Typography className={classes.noGradeText}>
+                Your grade is not ready yet
+              </Typography>
+              <Typography
+                className={classes.noGradeText}
+                style={{ marginTop: 8 }}
+              >
+                You need to wait until all students have graded your assignment
+              </Typography>
+            </div>
+          </div>
+        ) : (
+          <div className={classes.dialogContent}>
+            <div className={classes.noGradeContainer}>
+              <Typography className={classes.GradeText}>
+                Your Grade is:{" "}
+              </Typography>
+              <Typography
+                className={
+                  grade > assignment.passingGrade
+                    ? classes.passed
+                    : classes.failed
+                }
+              >
+                {grade > assignment.maxGrade ? assignment.maxGrade : grade}{" "}
+                {"/"} {assignment.maxGrade}
+              </Typography>
+            </div>
+          </div>
+        )
+      ) : (
+        <div className={classes.dialogContent}>
+          <div className={classes.noGradeContainer}>
+            <Typography className={classes.noGradeText}>
+              You have not graded all required students yet!
+            </Typography>
+          </div>
+        </div>
+      )}
     </>
   );
 }
@@ -188,5 +233,35 @@ const useStyles = makeStyles((theme) => ({
     top: 30,
     left: 35,
     color: theme.palette.error.main,
+  },
+  noGradeContainer: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    height: "100%",
+    width: "100%",
+  },
+  noGradeText: {
+    fontSize: 18,
+    fontWeight: 600,
+    color: theme.palette.text.secondary,
+  },
+  GradeText: {
+    fontSize: 24,
+    fontWeight: 600,
+    color: theme.palette.text.primary,
+  },
+  passed: {
+    fontSize: 24,
+    fontWeight: 600,
+    color: theme.palette.success.main,
+    marginBottom: 16,
+  },
+  failed: {
+    fontSize: 24,
+    fontWeight: 600,
+    color: theme.palette.error.main,
+    marginBottom: 16,
   },
 }));
