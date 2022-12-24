@@ -4,6 +4,7 @@ export interface Assignments {
   description: string;
   course: string;
   deadline: Date;
+  amount: number;
   files?: string[];
   submissions?: string[];
   passingGrade: number;

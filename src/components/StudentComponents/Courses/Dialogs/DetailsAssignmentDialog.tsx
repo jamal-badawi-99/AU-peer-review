@@ -4,7 +4,7 @@ import { Timestamp } from "firebase/firestore";
 import moment from "moment";
 import React, { useEffect } from "react";
 import { BiImages } from "react-icons/bi";
-import { MdClose, MdPictureAsPdf } from "react-icons/md";
+import { MdClose, MdFileCopy, MdPictureAsPdf } from "react-icons/md";
 import { db } from "../../../../firebase";
 import { Assignments } from "../../../../types/assignmentTypes";
 import { useSnackBar } from "../../../../utils/SnackbarContext";
@@ -90,6 +90,10 @@ function DetailsAssignmentDialog(props: Props) {
           value={moment(assignment.deadline).format("dddd DD/MM/YYYY hh:mm")}
         />
         <ItemWithLabel
+          label="Gradings/Student"
+          value={assignment.amount!.toString()}
+        />
+        <ItemWithLabel
           label="Passing Grade"
           value={
             assignment.passingGrade!.toString() +
@@ -118,11 +122,16 @@ function DetailsAssignmentDialog(props: Props) {
               }}
             >
               <Typography className={classes.fileName}>{name}</Typography>
-              {file.split("typeIs")[1].includes("image") ? (
+              {file.split("typeIs")[1].includes("image") && (
                 <BiImages size={50} className={classes.img} />
-              ) : (
+              )}
+              {file.split("typeIs")[1].includes("pdf") && (
                 <MdPictureAsPdf size={50} className={classes.pdf} />
               )}
+              {!file.split("typeIs")[1].includes("pdf") &&
+                !file.split("typeIs")[1].includes("image") && (
+                  <MdFileCopy size={50} className={classes.file} />
+                )}
             </ButtonBase>
           );
         })}
@@ -231,6 +240,12 @@ const useStyles = makeStyles((theme) => ({
     top: 30,
     left: 35,
     color: theme.palette.error.main,
+  },
+  file: {
+    position: "absolute",
+    top: 30,
+    left: 35,
+    color: theme.palette.grey[500],
   },
   filesContainer: {
     display: "grid",

@@ -13,7 +13,6 @@ function CourseInfo(props: Props) {
   const { course } = props;
 
   const classes = useStyles();
-  console.log(course);
   return (
     <div className={classes.container}>
       <div className={classes.items}>

@@ -69,7 +69,6 @@ function CourseAssignments(props: Props) {
       headerName: "Deadline",
       renderCell(params) {
         const date = params.value as Date;
-        console.log(date);
         return (
           <Typography>
             {moment(date).format("dddd DD/MM/YYYY HH:mm")}

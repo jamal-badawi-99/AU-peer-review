@@ -19,7 +19,6 @@ export default function AuthGuard({ children }: any) {
   const userInfo = useUser();
   const [tabs, setTabs] = useState<MenuTab[] | undefined>();
   useEffect(() => {
-    console.log(userInfo);
     if (userInfo?.userType === "admin") {
       setTabs(ADMIN_LAYOUT_ROUTES);
     } else if (userInfo?.userType === "lecturer") {

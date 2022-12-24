@@ -43,7 +43,6 @@ function CourseStudents(props: Props) {
             ...doc.data(),
           }))
           .filter((student) => props.course.students.includes(student.id));
-        console.log(data);
         setRows(data);
       });
   }, [props.course.students]);

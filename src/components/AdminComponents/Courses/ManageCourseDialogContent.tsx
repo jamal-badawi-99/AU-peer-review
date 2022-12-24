@@ -92,7 +92,6 @@ function ManageCourseDialogContent(props: Props) {
           if (e === "auth/email-already-in-use") {
             alert.show("Email Already In Use", "error");
           } else {
-            console.log(e);
             alert.show("An Error Has Occurred", "error");
           }
           formik.setSubmitting(false);

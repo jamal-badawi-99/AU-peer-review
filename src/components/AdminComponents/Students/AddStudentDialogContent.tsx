@@ -51,13 +51,11 @@ function AddStudentDialogContent(props: Props) {
           closeDialog();
         })
         .catch((e) => {
-          console.log(e, "SDKAJASJASLJKHFAHJLa");
           if (e === "auth/email-already-in-use") {
             alert.show("Email Already In Use", "error");
           } else if (e === "User already exists") {
             alert.show("Student Number Already Exists", "error");
           } else {
-            console.log(e);
             alert.show("An Error Has Occurred", "error");
           }
           formik.setSubmitting(false);

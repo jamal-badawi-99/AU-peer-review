@@ -9,13 +9,16 @@ import makeStyles from "@material-ui/core/styles/makeStyles";
 import { DateTimePicker } from "@material-ui/pickers";
 import firebase from "firebase/compat/app";
 import { useFormik } from "formik";
-import React from "react";
+import React, { useEffect } from "react";
 import { BiImages } from "react-icons/bi";
-import { MdAdd, MdClose, MdPictureAsPdf } from "react-icons/md";
+import { MdAdd, MdClose, MdFileCopy, MdPictureAsPdf } from "react-icons/md";
 import { v4 as uuidv4 } from "uuid";
 import * as Yup from "yup";
 import { db, storage } from "../../../firebase";
+import { Courses } from "../../../types/courseTypes";
+import { getRandomUserIds } from "../../../utils/randomGen";
 import { useSnackBar } from "../../../utils/SnackbarContext";
+import Loading from "../../Loading";
 import { scrollBarStyle } from "../../UserComponents/UserProfile";
 interface Props {
   closeDialog: () => void;
@@ -29,6 +32,22 @@ function AddAssignmentDialog(props: Props) {
 
   const classes = useStyles();
   const snackBar = useSnackBar();
+
+  const [students, setStudents] = React.useState<string[] | any>(null);
+  useEffect(() => {
+    const unsubscribe = db
+      .collection("courses")
+      .doc(courseId)
+      .onSnapshot((doc) => {
+        const data = doc.data() as Courses;
+        setStudents(data.students);
+      });
+
+    return () => {
+      unsubscribe();
+    };
+  }, [courseId]);
+
   const [files, setFiles] = React.useState<File[]>([]);
   const handlePicker = (event: any) => {
     if (event.target.files) {
@@ -45,11 +64,19 @@ function AddAssignmentDialog(props: Props) {
       passingGrade: 0,
       maxGrade: 0,
       deadline: null,
+      amount: 0,
     },
     validationSchema: Yup.object({
       title: Yup.string().required("Title is required"),
       description: Yup.string(),
       deadline: Yup.date().required("Deadline is required"),
+      amount: Yup.number()
+        .required("Gradings/Student is required")
+        .min(1, "Gradings/Student must be greater than 0")
+        .max(
+          students?.length - 1 ?? 0,
+          "Gradings/Student must be less than the number of students"
+        ),
       passingGrade: Yup.number()
         .required("Passing grade is required")
         .min(1, "Passing grade must be greater than 0"),
@@ -75,7 +102,7 @@ function AddAssignmentDialog(props: Props) {
               "uuidIs" +
               uuidv4().split("-")[0] +
               "typeIs" +
-              file.type
+              file.type.split("/").join("")
           );
           await fileRef.put(file);
           return await fileRef.getDownloadURL();
@@ -90,6 +117,7 @@ function AddAssignmentDialog(props: Props) {
             ...v,
             deadline: new Date(v.deadline!),
             files: urls,
+            whoGrades: await getRandomUserIds(students, v.amount!),
           })
           .then(async (docref) => {
             await db
@@ -111,7 +139,9 @@ function AddAssignmentDialog(props: Props) {
       });
     },
   });
-
+  if (!students) {
+    return <Loading />;
+  }
   return (
     <>
       <div className={classes.dialogTitleContainer}>
@@ -178,6 +208,20 @@ function AddAssignmentDialog(props: Props) {
           value={formik.values.maxGrade}
         />
 
+        <TextField
+          variant="standard"
+          error={Boolean(formik.touched.amount && formik.errors.amount)}
+          fullWidth
+          helperText={formik.touched.amount && formik.errors.amount}
+          label="Gradings/Student"
+          margin="normal"
+          name="amount"
+          onBlur={formik.handleBlur}
+          onChange={formik.handleChange}
+          type="number"
+          value={formik.values.amount}
+        />
+
         <DateTimePicker
           ampm={false}
           TextFieldComponent={(props) => (
@@ -202,9 +246,6 @@ function AddAssignmentDialog(props: Props) {
           <Typography className={classes.additionalLabel}>
             Additional Files
           </Typography>
-          <Typography className={classes.fileTypesLabel}>
-            (PDF/Images)
-          </Typography>
         </div>
         <div className={classes.additionalFiles}>
           {files?.map((file, index) => (
@@ -218,10 +259,14 @@ function AddAssignmentDialog(props: Props) {
                 </Typography>
               </div>
               <div>
-                {file.type.includes("image") ? (
+                {file.type.includes("image") && (
                   <BiImages size={50} className={classes.img} />
-                ) : (
+                )}
+                {file.type.includes("pdf") && (
                   <MdPictureAsPdf size={50} className={classes.pdf} />
+                )}
+                {!file.type.includes("pdf") && !file.type.includes("image") && (
+                  <MdFileCopy size={50} className={classes.file} />
                 )}
               </div>
               <IconButton
@@ -248,7 +293,7 @@ function AddAssignmentDialog(props: Props) {
           >
             <input
               hidden
-              accept="image/jpeg,image/gif,image/png,application/pdf,image/x-eps"
+              accept="*"
               type="file"
               multiple
               onChange={handlePicker}
@@ -396,5 +441,11 @@ const useStyles = makeStyles((theme) => ({
     top: 30,
     left: 35,
     color: theme.palette.error.main,
+  },
+  file: {
+    position: "absolute",
+    top: 30,
+    left: 35,
+    color: theme.palette.grey[500],
   },
 }));

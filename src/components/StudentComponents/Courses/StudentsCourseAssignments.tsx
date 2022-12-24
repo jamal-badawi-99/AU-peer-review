@@ -27,14 +27,16 @@ function StudentsCourseAssignments(props: Props) {
   const user = useUser();
   const classes = useStyles();
   const [assignmentId, setAssignmentId] = React.useState<string | null>(null);
+  const [submissionId, setSubmissionId] = React.useState<string | null>(null);
   const [submitOpen, openSubmit, closeSubmit] = useBoolean();
   const setSubmitOpen = (id: string) => {
     setAssignmentId(id);
     openSubmit();
   };
   const [gradeOpen, openGrade, closeGrade] = useBoolean();
-  const setGradeOpen = (id: string) => {
+  const setGradeOpen = (id: string, submitId: string) => {
     setAssignmentId(id);
+    setSubmissionId(submitId);
     openGrade();
   };
   const [detailsOpen, openDetails, closeDetails] = useBoolean();
@@ -121,7 +123,6 @@ function StudentsCourseAssignments(props: Props) {
       headerName: "Submit",
       renderCell(params) {
         const date = params.row.deadline;
-        console.log(submissions);
         const isSubmitted = submissions.some(
           (submission) => submission.assignment === params.row._id
         );
@@ -176,7 +177,7 @@ function StudentsCourseAssignments(props: Props) {
           <Button
             variant="contained"
             color="primary"
-            onClick={() => setGradeOpen(params.row._id)}
+            onClick={() => setGradeOpen(params.row._id,submission._id)}
             fullWidth
           >
             View Grade
@@ -224,8 +225,8 @@ function StudentsCourseAssignments(props: Props) {
         classes={{ paper: classes.dialog }}
       >
         <GradeAssignmentDialog
-          courseId={course._id}
           assignmentId={assignmentId!}
+          submissionId={submissionId!}
           onClose={closeGrade}
         />
       </Dialog>

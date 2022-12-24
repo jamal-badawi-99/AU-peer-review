@@ -10,7 +10,7 @@ import makeStyles from "@material-ui/core/styles/makeStyles";
 import { useFormik } from "formik";
 import React from "react";
 import { BiImages } from "react-icons/bi";
-import { MdAdd, MdClose, MdPictureAsPdf } from "react-icons/md";
+import { MdAdd, MdClose, MdFileCopy, MdPictureAsPdf } from "react-icons/md";
 import { v4 as uuidv4 } from "uuid";
 import * as Yup from "yup";
 import { db, storage } from "../../../../firebase";
@@ -55,7 +55,7 @@ function SubmitAssignmentDialog(props: Props) {
               "uuidIs" +
               uuidv4().split("-")[0] +
               "typeIs" +
-              file.type
+              file.type.split("/").join("")
           );
           await fileRef.put(file);
           return await fileRef.getDownloadURL();
@@ -67,7 +67,7 @@ function SubmitAssignmentDialog(props: Props) {
           await db
             .collection("submissions")
 
-            .add({ ...v, files: urls, grades: [] });
+            .add({ ...v, files: urls, grades: [], studentsGraded: [] });
         })
         .then(() => {
           snackBar.show("Submitted Assignment", "success");
@@ -114,9 +114,7 @@ function SubmitAssignmentDialog(props: Props) {
           <Typography className={classes.additionalLabel}>
             Additional Files
           </Typography>
-          <Typography className={classes.fileTypesLabel}>
-            (PDF/Images)
-          </Typography>
+    
         </div>
         <FormHelperText
           error={Boolean(formik.touched.files && formik.errors.files)}
@@ -135,10 +133,14 @@ function SubmitAssignmentDialog(props: Props) {
                 </Typography>
               </div>
               <div>
-                {file.type.includes("image") ? (
+                {file.type.includes("image") && (
                   <BiImages size={50} className={classes.img} />
-                ) : (
+                )}
+                {file.type.includes("pdf") && (
                   <MdPictureAsPdf size={50} className={classes.pdf} />
+                )}
+                {!file.type.includes("pdf") && !file.type.includes("image") && (
+                  <MdFileCopy size={50} className={classes.file} />
                 )}
               </div>
               <IconButton
@@ -168,7 +170,8 @@ function SubmitAssignmentDialog(props: Props) {
           >
             <input
               hidden
-              accept="image/jpeg,image/gif,image/png,application/pdf,image/x-eps"
+              //accept all files
+              accept="*"
               type="file"
               multiple
               onChange={handlePicker}
@@ -314,5 +317,11 @@ const useStyles = makeStyles((theme) => ({
     top: 30,
     left: 35,
     color: theme.palette.error.main,
+  },
+  file: {
+    position: "absolute",
+    top: 30,
+    left: 35,
+    color: theme.palette.grey[500],
   },
 }));

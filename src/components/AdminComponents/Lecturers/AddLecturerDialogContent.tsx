@@ -56,14 +56,12 @@ function AddLecturerDialogContent(props: Props) {
           } else if (e === "User already exists") {
             alert.show("Username Already In Use", "error");
           } else {
-            console.log(e);
             alert.show("An Error Has Occurred", "error");
           }
           formik.setSubmitting(false);
         });
     },
   });
-  console.log(formik.values);
   return (
     <>
       <div className={classes.dialogTitleContainer}>

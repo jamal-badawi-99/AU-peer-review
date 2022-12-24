@@ -18,7 +18,6 @@ function LecturerCourseView() {
   const location = useLocation();
   const [course, setCourse] = React.useState<Courses | null>(null);
   React.useEffect(() => {
-    console.log(location.pathname);
     db.collection("courses")
       .doc(location.pathname.split("/")[2])
       .onSnapshot((snapshot) => {
