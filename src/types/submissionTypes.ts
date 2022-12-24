@@ -1,11 +1,17 @@
 export interface Submissions {
   _id: string;
   student: string;
-  homework: string;
+  assignment: string;
+  course: string;
   files?: string[];
-  grade?: number;
-  comment?: string;
-  gradedBy?: string[];
-  gradedOthers?: string[];
+  note?: string;
+  grades: Grades[];
+  studentsGraded?: string[];
   objectionStatus?: "none" | "resolved" | "pending";
+}
+
+interface Grades {
+  gradedBy: string;
+  grade: number;
+  comment?: string;
 }

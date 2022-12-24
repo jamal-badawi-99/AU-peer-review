@@ -1,74 +1,54 @@
 import {
   Button,
   CircularProgress,
+  FormHelperText,
   IconButton,
   TextField,
   Typography,
 } from "@material-ui/core";
 import makeStyles from "@material-ui/core/styles/makeStyles";
-import { DateTimePicker } from "@material-ui/pickers";
-import firebase from "firebase/compat/app";
 import { useFormik } from "formik";
 import React from "react";
 import { BiImages } from "react-icons/bi";
 import { MdAdd, MdClose, MdPictureAsPdf } from "react-icons/md";
 import { v4 as uuidv4 } from "uuid";
 import * as Yup from "yup";
-import { db, storage } from "../../../firebase";
-import { useSnackBar } from "../../../utils/SnackbarContext";
-import { scrollBarStyle } from "../../UserComponents/UserProfile";
+import { db, storage } from "../../../../firebase";
+import { useSnackBar } from "../../../../utils/SnackbarContext";
+import { useUser } from "../../../../utils/UserContext";
+import { scrollBarStyle } from "../../../UserComponents/UserProfile";
 interface Props {
-  closeDialog: () => void;
+  onClose: () => void;
+  assignmentId: string;
   courseId: string;
 }
 
-export default React.memo(AddAssignmentDialog);
+export default React.memo(GradeAssignmentDialog);
 
-function AddAssignmentDialog(props: Props) {
-  const { closeDialog, courseId } = props;
+function GradeAssignmentDialog(props: Props) {
+  const { assignmentId, onClose, courseId } = props;
 
   const classes = useStyles();
   const snackBar = useSnackBar();
-  const [files, setFiles] = React.useState<File[]>([]);
-  const handlePicker = (event: any) => {
-    if (event.target.files) {
-      setFiles((prev) => {
-        return [...prev, ...event.target.files];
-      });
-    }
-  };
+  const user = useUser();
   const formik = useFormik({
     initialValues: {
-      title: "",
-      description: "",
+      files: [] as File[],
+      note: "",
+      student: user._id,
+      assignment: assignmentId,
       course: courseId,
-      passingGrade: 0,
-      maxGrade: 0,
-      deadline: null,
     },
     validationSchema: Yup.object({
-      title: Yup.string().required("Title is required"),
-      description: Yup.string(),
-      deadline: Yup.date().required("Deadline is required"),
-      passingGrade: Yup.number()
-        .required("Passing grade is required")
-        .min(1, "Passing grade must be greater than 0"),
-      maxGrade: Yup.number()
-
-        .required("Max grade is required")
-        .min(1, "Max grade must be greater than 0")
-        .test(
-          "passing",
-          "Passing grade must be less than max grade",
-          function (value) {
-            return this.parent.passingGrade < value!;
-          }
-        ),
+      note: Yup.string(),
+      files: Yup.array()
+        .min(1, "You need to upload at least one file")
+        .required("You need to upload at least one file"),
     }),
     onSubmit: async (v, { setSubmitting }) => {
       return Promise.all(
-        files.map(async (file) => {
-          const storageRef = storage.ref("courses/" + courseId + "/");
+        v.files.map(async (file) => {
+          const storageRef = storage.ref("submissions/" + assignmentId + "/");
           const fileRef = storageRef.child(
             "fileNameIs" +
               file.name +
@@ -80,123 +60,55 @@ function AddAssignmentDialog(props: Props) {
           await fileRef.put(file);
           return await fileRef.getDownloadURL();
         })
-      ).then(async (urls) => {
-        setSubmitting(true);
+      )
+        .then(async (urls) => {
+          setSubmitting(true);
 
-        await db
-          .collection("assignments")
+          await db
+            .collection("submissions")
 
-          .add({
-            ...v,
-            deadline: new Date(v.deadline!),
-            files: urls,
-          })
-          .then(async (docref) => {
-            await db
-              .collection("courses")
-              .doc(courseId)
-              .update({
-                assignments: firebase.firestore.FieldValue.arrayUnion(
-                  docref.id
-                ),
-              })
-              .then(() => {
-                snackBar.show("Added Assignment", "success");
-                closeDialog();
-              })
-              .finally(() => {
-                setSubmitting(false);
-              });
-          });
-      });
+            .add({ ...v, files: urls, grades: [] });
+        })
+        .then(() => {
+          snackBar.show("Submitted Assignment", "success");
+          onClose();
+        })
+        .finally(() => {
+          setSubmitting(false);
+        });
     },
   });
-
+  const handlePicker = (event: any) => {
+    if (event.target.files) {
+      formik.setFieldValue("files", [
+        ...formik.values.files,
+        ...event.target.files,
+      ]);
+    }
+  };
   return (
     <>
       <div className={classes.dialogTitleContainer}>
-        <Typography className={classes.dialogTitle}>Add Assignment</Typography>
-        <IconButton onClick={closeDialog}>
+        <Typography className={classes.dialogTitle}>
+          Submit Assignment
+        </Typography>
+        <IconButton onClick={onClose}>
           <MdClose />
         </IconButton>
       </div>
       <form className={classes.dialogContent} onSubmit={formik.handleSubmit}>
         <TextField
           variant="standard"
-          error={Boolean(formik.touched.title && formik.errors.title)}
+          error={Boolean(formik.touched.note && formik.errors.note)}
           fullWidth
-          helperText={formik.touched.title && formik.errors.title}
-          label="Title"
+          helperText={formik.touched.note && formik.errors.note}
+          label="Note"
           margin="normal"
-          name="title"
+          name="note"
           onBlur={formik.handleBlur}
           onChange={formik.handleChange}
           type="text"
-          value={formik.values.title}
-        />
-        <TextField
-          variant="standard"
-          error={Boolean(
-            formik.touched.description && formik.errors.description
-          )}
-          fullWidth
-          helperText={formik.touched.description && formik.errors.description}
-          label="Description"
-          margin="normal"
-          name="description"
-          onBlur={formik.handleBlur}
-          onChange={formik.handleChange}
-          type="text"
-          value={formik.values.description}
-        />
-        <TextField
-          variant="standard"
-          error={Boolean(
-            formik.touched.passingGrade && formik.errors.passingGrade
-          )}
-          fullWidth
-          helperText={formik.touched.passingGrade && formik.errors.passingGrade}
-          label="Passing Grade"
-          margin="normal"
-          name="passingGrade"
-          onBlur={formik.handleBlur}
-          onChange={formik.handleChange}
-          type="number"
-          value={formik.values.passingGrade}
-        />
-        <TextField
-          variant="standard"
-          error={Boolean(formik.touched.maxGrade && formik.errors.maxGrade)}
-          fullWidth
-          helperText={formik.touched.maxGrade && formik.errors.maxGrade}
-          label="Max Grade"
-          margin="normal"
-          name="maxGrade"
-          onBlur={formik.handleBlur}
-          onChange={formik.handleChange}
-          type="number"
-          value={formik.values.maxGrade}
-        />
-
-        <DateTimePicker
-          ampm={false}
-          TextFieldComponent={(props) => (
-            <TextField
-              variant="standard"
-              fullWidth
-              {...props}
-              label="Deadline"
-              margin="normal"
-              name="deadline"
-              onBlur={formik.handleBlur}
-              type="deadLine"
-            />
-          )}
-          format="dddd DD/MM/yyyy HH:mm"
-          label="Deadline"
-          views={["year", "month", "date", "hours", "minutes"]}
-          value={formik.values.deadline}
-          onChange={(date) => formik.setFieldValue("deadline", date)}
+          value={formik.values.note}
         />
         <div className={classes.labelsContainer}>
           <Typography className={classes.additionalLabel}>
@@ -206,8 +118,13 @@ function AddAssignmentDialog(props: Props) {
             (PDF/Images)
           </Typography>
         </div>
+        <FormHelperText
+          error={Boolean(formik.touched.files && formik.errors.files)}
+        >
+          {formik.errors.files?.toString()}
+        </FormHelperText>
         <div className={classes.additionalFiles}>
-          {files?.map((file, index) => (
+          {formik.values.files?.map((file, index) => (
             <div key={index} className={classes.fileContainer}>
               <div className={classes.nameType}>
                 <Typography className={classes.fileName}>
@@ -228,7 +145,10 @@ function AddAssignmentDialog(props: Props) {
                 className={classes.removeFileButton}
                 disabled={formik.isSubmitting}
                 onClick={() => {
-                  setFiles((prev) => prev?.filter((file, i) => i !== index));
+                  formik.setFieldValue(
+                    "files",
+                    formik.values.files.filter((file, i) => i !== index)
+                  );
                 }}
               >
                 <MdClose />
@@ -276,8 +196,6 @@ function AddAssignmentDialog(props: Props) {
           )}
         </div>
       </form>
-
-      <div className={classes.dialogActions}></div>
     </>
   );
 }
