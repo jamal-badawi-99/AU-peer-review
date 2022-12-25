@@ -6,7 +6,10 @@ export interface Submissions {
   files?: string[];
   note?: string;
   grades: Grades[];
-  objectionStatus?: "none" | "resolved" | "pending";
+  objection?:{
+    status?: "none" | "resolved" | "pending";
+    grade?: number;
+  }
 }
 
 interface Grades {

@@ -12,6 +12,7 @@ import { Courses } from "../../../types/courseTypes";
 import { Submissions } from "../../../types/submissionTypes";
 import { useUser } from "../../../utils/UserContext";
 import Loading from "../../Loading";
+import { scrollBarStyle } from "../../UserComponents/UserProfile";
 import DetailsAssignmentDialog from "./Dialogs/DetailsAssignmentDialog";
 import GradeAssignmentDialog from "./Dialogs/GradeAssignmentDialog";
 import GradeOthersAssignmentDialog from "./Dialogs/GradeOthersAssignmentDialog";
@@ -324,6 +325,7 @@ const useStyles = makeStyles((theme) => ({
   dialog: {
     minWidth: 600,
     padding: 16,
+    ...scrollBarStyle,
   },
   cell: {
     outline: "none !important",

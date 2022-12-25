@@ -67,7 +67,14 @@ function SubmitAssignmentDialog(props: Props) {
           await db
             .collection("submissions")
 
-            .add({ ...v, files: urls, grades: [] });
+            .add({
+              ...v,
+              files: urls,
+              grades: [],
+              objection: {
+                status: "none",
+              },
+            });
         })
         .then(() => {
           snackBar.show("Submitted Assignment", "success");

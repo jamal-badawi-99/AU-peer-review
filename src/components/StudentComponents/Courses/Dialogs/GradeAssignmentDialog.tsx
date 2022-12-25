@@ -1,4 +1,4 @@
-import { IconButton, Typography } from "@material-ui/core";
+import { Button, IconButton, Typography } from "@material-ui/core";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import React, { useEffect } from "react";
 import { MdClose } from "react-icons/md";
@@ -56,11 +56,19 @@ function GradeAssignmentDialog(props: Props) {
       ? assignment.whoGraded![user._id].length
       : 0
     : 0;
-  const grade = submission.grades
+  const gradeReducer = submission.grades
     .map((x) => {
       return x.grade;
     })
     .reduce((a, b) => a + b, 0);
+  const grade =
+    submission.objection?.status !== "none"
+      ? submission.objection?.grade
+      : gradeReducer;
+
+  const comments = submission.grades.map((x) => {
+    return x.comment;
+  });
   return (
     <>
       <div className={classes.dialogTitleContainer}>
@@ -94,15 +102,65 @@ function GradeAssignmentDialog(props: Props) {
               </Typography>
               <Typography
                 className={
-                  grade > assignment.passingGrade
+                  grade! > assignment.passingGrade
                     ? classes.passed
                     : classes.failed
                 }
               >
-                {grade > assignment.maxGrade ? assignment.maxGrade : grade}{" "}
+                {grade! > assignment.maxGrade ? assignment.maxGrade : grade}{" "}
                 {"/"} {assignment.maxGrade}
               </Typography>
+              {submission.objection?.status === "resolved" ? (
+                <Typography className={classes.GradeText}>
+                  {`(after objection resolved)`}
+                </Typography>
+              ) : null}
             </div>
+            <div className={classes.notSatisfiedContainer}>
+              <Typography className={classes.notSatisfiedText}>
+                Not satisfied with your grade?
+              </Typography>
+              {submission.objection?.status === "none" ? (
+                <Button
+                  className={classes.object}
+                  onClick={() => {
+                    db.collection("submissions")
+                      .doc(submissionId)
+                      .update({
+                        objection: {
+                          status: "pending",
+                          grade: grade,
+                        },
+                      });
+                  }}
+                >
+                  Object
+                </Button>
+              ) : (
+                <Typography className={classes.youHaveAlready}>
+                  You have already objected your grade
+                </Typography>
+              )}
+            </div>
+            {comments.length > 0 ? (
+              <Typography className={classes.additionalLabel}>
+                Notes:
+              </Typography>
+            ) : null}
+            {comments.length > 0 ? (
+              <div className={classes.notesContainer}>
+                {comments.map((x, i) => {
+                  return (
+                    <div className={classes.noteContainer} key={i}>
+                      <Typography className={classes.noteNumber}>{`Comment #${
+                        i + 1
+                      }`}</Typography>
+                      <Typography className={classes.note}>{x}</Typography>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : null}
           </div>
         )
       ) : (
@@ -262,5 +320,78 @@ const useStyles = makeStyles((theme) => ({
     fontWeight: 600,
     color: theme.palette.error.main,
     marginBottom: 16,
+  },
+  notesContainer: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "flex-start",
+    justifyContent: "center",
+    height: "100%",
+    width: "100%",
+    marginTop: 16,
+    minHeight: 240,
+    overflow: "auto",
+    ...scrollBarStyle,
+  },
+  notes: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "flex-start",
+    justifyContent: "center",
+    height: "100%",
+    width: "100%",
+    marginTop: 16,
+  },
+  noteContainer: {
+    border: `1px solid ${theme.palette.divider}`,
+    borderRadius: 4,
+    padding: 8,
+    boxSizing: "border-box",
+    boxShadow: "0px 0px 4px rgba(0, 0, 0, 0.25)",
+    marginBottom: 8,
+
+    width: "100%",
+    "& .last-child": {
+      marginBottom: 0,
+    },
+  },
+  note: {
+    fontSize: 18,
+    fontWeight: 500,
+    color: theme.palette.text.primary,
+    marginBottom: 4,
+    marginInlineStart: 8,
+    wordBreak: "break-all",
+  },
+  noteNumber: {
+    fontSize: 16,
+    fontWeight: 400,
+    marginBottom: 4,
+    color: theme.palette.text.secondary,
+  },
+  notSatisfiedContainer: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "100%",
+  },
+  notSatisfiedText: {
+    fontSize: 18,
+    fontWeight: 600,
+    color: theme.palette.text.secondary,
+  },
+  object: {
+    background: theme.palette.error.main,
+    color: theme.palette.error.contrastText,
+    width: 120,
+    marginTop: 8,
+    "&:hover": {
+      background: theme.palette.error.dark,
+    },
+  },
+  youHaveAlready: {
+    fontSize: 14,
+    color: theme.palette.warning.main,
   },
 }));
