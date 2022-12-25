@@ -6,6 +6,7 @@ import {
   Typography,
 } from "@material-ui/core";
 import { useFormik } from "formik";
+import { MdSchool } from "react-icons/md";
 import { Link, useNavigate } from "react-router-dom";
 import * as Yup from "yup";
 import { auth, db } from "../firebase";
@@ -55,20 +56,20 @@ function Login() {
   return (
     <div className={classes.container}>
       <form onSubmit={formik.handleSubmit} className={classes.form}>
-        <Box sx={{ my: 3 }}>
+        <div style={{
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "center",
+        }}>
           <Typography
             color="textPrimary"
             variant="h4"
-            style={{ marginBottom: 16 }}
+            style={{ marginBottom: 16 ,width:'100%'}}
           >
             Sign in
           </Typography>
-          <Typography
-            color="textSecondary"
-            gutterBottom
-            variant="body2"
-          ></Typography>
-        </Box>
+          <MdSchool size={60} className={classes.logo} />
+        </div>
 
         <TextField
           variant="standard"
@@ -153,5 +154,12 @@ const useStyles = makeStyles((theme) => ({
   linkActions: {
     display: "flex",
     justifyContent: "space-between",
+  },
+  logo: {
+    pointerEvents: "none",
+    userSelect: "none",
+   
+marginInlineEnd:16,
+    color: theme.palette.primary.main,
   },
 }));
