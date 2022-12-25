@@ -45,7 +45,7 @@ export async function accountCreator(props: Props) {
               .then(async () => {
                 await emailjs.send(
                   "service_f4o7j2r",
-                  "template_ftr5nmc",
+                  "template_88g2857",
                   {
                     sendTo: props.email,
                     pass: pass,
