@@ -1,4 +1,4 @@
-import { Dialog, Fab, Typography } from "@material-ui/core";
+import { Button, Dialog, Fab, Typography } from "@material-ui/core";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import { DataGrid, GridColDef } from "@material-ui/data-grid";
 import { Timestamp } from "firebase/firestore";
@@ -12,6 +12,7 @@ import { Assignments } from "../../../types/assignmentTypes";
 import { Courses } from "../../../types/courseTypes";
 import Loading from "../../Loading";
 import AddAssignmentDialog from "./AddAssignmentDialog";
+import ObjectionsDialog from "./ObjectionsDialog";
 
 interface Props {
   course: Courses;
@@ -25,6 +26,14 @@ function CourseAssignments(props: Props) {
   const classes = useStyles();
   const [addAssignment, openAddAssignment, closeAddAssignment] = useBoolean();
   const [assignments, setAssignments] = React.useState<Assignments[]>([]);
+  const [selectedAssignment, setSelectedAssignment] =
+    React.useState<Assignments | null>(null);
+
+  const [objections, openObjections, closeObjections] = useBoolean();
+  const onObjectionView = (assignment: Assignments) => {
+    setSelectedAssignment(assignment);
+    openObjections();
+  };
   useEffect(() => {
     db.collection("assignments")
       .where("course", "==", course._id)
@@ -41,6 +50,7 @@ function CourseAssignments(props: Props) {
         setAssignments(data);
       });
   }, [course._id]);
+
   const columns: GridColDef[] = [
     {
       field: "title",
@@ -79,6 +89,29 @@ function CourseAssignments(props: Props) {
       width: 250,
       align: "left",
     },
+    {
+      field: "objections",
+      headerName: "Objections",
+      renderCell(params) {
+        const assignment = assignments.find((a) => a._id === params.row._id);
+
+        return (
+          <Button
+            variant="outlined"
+            color="secondary"
+            onClick={() => {
+              onObjectionView(assignment!);
+            }}
+          >
+            View Objections
+          </Button>
+        );
+      },
+      width: 140,
+      align: "left",
+      sortable: false,
+      disableColumnMenu: true,
+    },
   ];
   if (assignments === null) return <Loading />;
   if (assignments.length === 0)
@@ -109,6 +142,16 @@ function CourseAssignments(props: Props) {
   return (
     <div className={classes.container}>
       <Dialog
+        open={objections}
+        onClose={closeObjections}
+        classes={{ paper: classes.objectionDialog }}
+      >
+        <ObjectionsDialog
+          closeDialog={closeObjections}
+          assignment={selectedAssignment!}
+        />
+      </Dialog>
+      <Dialog
         open={addAssignment}
         onClose={closeAddAssignment}
         classes={{ paper: classes.dialog }}
@@ -128,7 +171,7 @@ function CourseAssignments(props: Props) {
         Add Assignment
       </Fab>
       <div className={classes.contentContainer}>
-        <div style={{ height: "100%", width: 800, userSelect: "none" }}>
+        <div style={{ height: "100%", width: 920, userSelect: "none" }}>
           <DataGrid
             rows={assignments}
             columns={columns}
@@ -154,6 +197,10 @@ const useStyles = makeStyles((theme) => ({
   },
   dialog: {
     minWidth: 600,
+    padding: 16,
+  },
+  objectionDialog: {
+    minWidth: 300,
     padding: 16,
   },
   cell: {

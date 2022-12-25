@@ -9,6 +9,7 @@ export interface Submissions {
   objection?:{
     status?: "none" | "resolved" | "pending";
     grade?: number;
+    comment?: string;
   }
 }
 

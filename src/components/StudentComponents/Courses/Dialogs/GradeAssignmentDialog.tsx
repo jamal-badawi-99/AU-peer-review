@@ -111,15 +111,22 @@ function GradeAssignmentDialog(props: Props) {
                 {"/"} {assignment.maxGrade}
               </Typography>
               {submission.objection?.status === "resolved" ? (
-                <Typography className={classes.GradeText}>
-                  {`(after objection resolved)`}
+                <Typography
+                  className={classes.notSatisfiedText}
+                >{`(after objection resolved)`}</Typography>
+              ) : null}
+              {submission.objection?.status === "resolved" ? (
+                <Typography className={classes.lecturerComment}>
+                  Lecturer Comment: {submission.objection?.comment}
                 </Typography>
               ) : null}
             </div>
             <div className={classes.notSatisfiedContainer}>
-              <Typography className={classes.notSatisfiedText}>
-                Not satisfied with your grade?
-              </Typography>
+              {submission.objection?.status !== "resolved" ? (
+                <Typography className={classes.notSatisfiedText}>
+                  Not satisfied with your grade?
+                </Typography>
+              ) : null}
               {submission.objection?.status === "none" ? (
                 <Button
                   className={classes.object}
@@ -393,5 +400,10 @@ const useStyles = makeStyles((theme) => ({
   youHaveAlready: {
     fontSize: 14,
     color: theme.palette.warning.main,
+  },
+  lecturerComment: {
+    fontSize: 14,
+    marginTop: 4,
+    marginBottom: 4,
   },
 }));

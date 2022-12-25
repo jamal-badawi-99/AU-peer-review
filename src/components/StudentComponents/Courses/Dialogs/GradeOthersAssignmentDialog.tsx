@@ -17,7 +17,7 @@ import { useUser } from "../../../../utils/UserContext";
 import Loading from "../../../Loading";
 import { scrollBarStyle } from "../../../UserComponents/UserProfile";
 
-function ItemWithLabel(props: {
+export function ItemWithLabel(props: {
   label: string;
   value: string;
   break?: boolean;
