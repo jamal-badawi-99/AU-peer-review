@@ -29,6 +29,7 @@ function Login() {
         .min(6, "Too Short!, Make sure it's more than 6 characters long.")
         .required("Password is required"),
     }),
+    
     onSubmit: (v) => {
       db.collection("users")
         .where("number", "==", v.username)
@@ -116,14 +117,15 @@ function Login() {
           >
         
           </Typography>
-          <Link
-            to="/forgot-password"
-            style={{ cursor: "pointer", textDecoration: "none" }}
+          <div
+           onClick={() => {
+            navigate("/forgot-password");
+           }}
           >
-            <Typography variant="body2" style={{ marginTop: 8 }}>
+            <Typography variant="body2" style={{ marginTop: 8 }} className={classes.forgot} >
               Forgot Password?{" "}
             </Typography>
-          </Link>
+          </div>
         </div>
       </form>
     </div>
@@ -161,5 +163,15 @@ const useStyles = makeStyles((theme) => ({
    
 marginInlineEnd:16,
     color: theme.palette.primary.main,
+  },
+  forgot: {
+    cursor: "pointer",
+    color: theme.palette.secondary.light,
+    transition: "all 0.3s ease-in-out",
+    fontSize: 16,
+    fontWeight: 500,
+    '&:hover': {
+      color: theme.palette.secondary.dark,
+    }
   },
 }));
