@@ -174,7 +174,13 @@ function ManageCourseDialogContent(props: Props) {
         >
           {students.map((s) => {
             return (
-              <MenuItem key={s._id} value={s._id}>
+              <MenuItem
+                key={s._id}
+                value={s._id}
+                classes={{
+                  selected: classes.selected,
+                }}
+              >
                 {s.fullName}
               </MenuItem>
             );
@@ -245,5 +251,9 @@ const useStyles = makeStyles((theme) => ({
     alignItems: "center",
     justifyContent: "flex-end",
     marginTop: 16,
+  },
+  selected: {
+    backgroundColor: `${theme.palette.info.light} !important`,
+    color: `${theme.palette.info.contrastText} !important`,
   },
 }));
