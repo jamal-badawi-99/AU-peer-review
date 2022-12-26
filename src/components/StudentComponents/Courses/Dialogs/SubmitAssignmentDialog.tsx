@@ -49,13 +49,17 @@ function SubmitAssignmentDialog(props: Props) {
       return Promise.all(
         v.files.map(async (file) => {
           const storageRef = storage.ref("submissions/" + assignmentId + "/");
+          const fExtensionLen = file.name.split(".").length;
+          const fExtension = file.name.split(".")[fExtensionLen - 1];
           const fileRef = storageRef.child(
             "fileNameIs" +
               file.name +
               "uuidIs" +
               uuidv4().split("-")[0] +
               "typeIs" +
-              file.type.split("/").join("")
+              file.type.split("/").join("") +
+              "." +
+              fExtension
           );
           await fileRef.put(file);
           return await fileRef.getDownloadURL();

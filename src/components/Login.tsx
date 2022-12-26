@@ -7,7 +7,7 @@ import {
 } from "@material-ui/core";
 import { useFormik } from "formik";
 import { MdSchool } from "react-icons/md";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import * as Yup from "yup";
 import { auth, db } from "../firebase";
 import { useSnackBar } from "../utils/SnackbarContext";
@@ -29,12 +29,17 @@ function Login() {
         .min(6, "Too Short!, Make sure it's more than 6 characters long.")
         .required("Password is required"),
     }),
-    
-    onSubmit: (v) => {
+
+    onSubmit: (v, { setSubmitting }) => {
       db.collection("users")
         .where("number", "==", v.username)
         .get()
         .then((querySnapshot) => {
+          if (querySnapshot.empty) {
+            alert.show("Account not found", "error");
+            formik.setSubmitting(false);
+            return;
+          }
           querySnapshot.forEach((doc) => {
             auth
               .signInWithEmailAndPassword(doc.data().email, v.password)
@@ -57,15 +62,17 @@ function Login() {
   return (
     <div className={classes.container}>
       <form onSubmit={formik.handleSubmit} className={classes.form}>
-        <div style={{
-          display: "flex",
-          flexDirection: "row",
-          alignItems: "center",
-        }}>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+          }}
+        >
           <Typography
             color="textPrimary"
             variant="h4"
-            style={{ marginBottom: 16 ,width:'100%'}}
+            style={{ marginBottom: 16, width: "100%" }}
           >
             Sign in
           </Typography>
@@ -114,15 +121,17 @@ function Login() {
             color="textSecondary"
             variant="body2"
             style={{ marginTop: 8 }}
-          >
-        
-          </Typography>
+          ></Typography>
           <div
-           onClick={() => {
-            navigate("/forgot-password");
-           }}
+            onClick={() => {
+              navigate("/forgot-password");
+            }}
           >
-            <Typography variant="body2" style={{ marginTop: 8 }} className={classes.forgot} >
+            <Typography
+              variant="body2"
+              style={{ marginTop: 8 }}
+              className={classes.forgot}
+            >
               Forgot Password?{" "}
             </Typography>
           </div>
@@ -160,8 +169,8 @@ const useStyles = makeStyles((theme) => ({
   logo: {
     pointerEvents: "none",
     userSelect: "none",
-   
-marginInlineEnd:16,
+
+    marginInlineEnd: 16,
     color: theme.palette.primary.main,
   },
   forgot: {
@@ -170,8 +179,8 @@ marginInlineEnd:16,
     transition: "all 0.3s ease-in-out",
     fontSize: 16,
     fontWeight: 500,
-    '&:hover': {
+    "&:hover": {
       color: theme.palette.secondary.dark,
-    }
+    },
   },
 }));

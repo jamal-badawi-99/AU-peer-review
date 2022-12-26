@@ -112,6 +112,8 @@ function StudentsCourseAssignments(props: Props) {
       field: "details",
       headerName: "Details",
       width: 160,
+      sortable: false,
+      disableColumnMenu: true,
       renderCell(params) {
         return (
           <Button
@@ -201,9 +203,10 @@ function StudentsCourseAssignments(props: Props) {
           </Button>
         );
       },
-      type: "date",
       width: 160,
       align: "center",
+      sortable: false,
+      disableColumnMenu: true,
     },
     {
       field: "grade",
@@ -244,6 +247,8 @@ function StudentsCourseAssignments(props: Props) {
       type: "date",
       width: 160,
       align: "center",
+      sortable: false,
+      disableColumnMenu: true,
     },
   ];
   if (assignments === null) return <Loading />;

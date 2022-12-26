@@ -49,6 +49,7 @@ export async function accountCreator(props: Props) {
                   {
                     sendTo: props.email,
                     pass: pass,
+                    username: props.username,
                   },
                   "GUb3iWN1Xmonq1G-p"
                 );

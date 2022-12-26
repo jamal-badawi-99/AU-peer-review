@@ -90,9 +90,16 @@ function ObjectionsDialog(props: Props) {
         {submissions.map((submission, i) => {
           return (
             <div key={submission._id} className={classes.studentContainer}>
-              <Typography className={classes.studentText}>{`Student ${
+              <Typography className={classes.studentText}>{`#${
                 i + 1
               }`}</Typography>
+              {submission?.objection?.grade ? (
+                <Typography className={classes.studentText}>{`Grade: ${
+                  submission?.objection.grade > 100
+                    ? 100
+                    : submission?.objection?.grade
+                }`}</Typography>
+              ) : null}
               {submission?.objection?.status === "resolved" ? (
                 <Button variant="contained" color="primary" disabled>
                   Resolved
@@ -163,8 +170,8 @@ const useStyles = makeStyles((theme) => ({
     fontSize: 18,
     color: theme.palette.text.primary,
   },
-  dialog:{
+  dialog: {
     minWidth: 600,
-    padding:16
-  }
+    padding: 16,
+  },
 }));
