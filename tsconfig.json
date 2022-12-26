@@ -22,5 +22,5 @@
   },
   "include": [
     "src"
-, "src/components/StudentComponents/Courses/Dialogs/.tsx"  ]
+, "src/components/StudentComponents/Courses/Dialogs/.tsx", "src/components/LecturerComponents/Courses/GradesDialog.tsx"  ]
 }

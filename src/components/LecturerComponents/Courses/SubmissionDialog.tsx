@@ -209,6 +209,7 @@ const useStyles = makeStyles((theme) => ({
   itemContainer: {
     display: "flex",
     flexDirection: "column",
+    alignItems: "flex-start",
     marginBottom: 16,
   },
   label: {

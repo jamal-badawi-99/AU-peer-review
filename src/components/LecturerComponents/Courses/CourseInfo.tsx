@@ -53,7 +53,7 @@ const useStyles = makeStyles((theme) => ({
 
     flexDirection: "column",
     width: "100%",
-    maxWidth: 500,
+    maxWidth: 300,
     margin: 24,
     padding: 24,
     backgroundColor: theme.palette.background.paper,
@@ -62,15 +62,15 @@ const useStyles = makeStyles((theme) => ({
     border: "1px solid #E5E5E5",
   },
   label: {
-    fontSize: 20,
+    fontSize: 16,
     fontWeight: 600,
     color: theme.palette.text.secondary,
   },
   itemDescription: {
-    fontSize: 28,
+    fontSize: 22,
     fontWeight: 400,
     color: theme.palette.text.primary,
-    marginBottom: 24,
+    marginBottom: 16,
     marginTop: 4,
     marginInline: 8,
     "&:last-child": {

@@ -68,12 +68,15 @@ function GradeOthersAssignmentDialog(props: Props) {
 
   useEffect(() => {
     const ids = assignment.whoGrades![user._id] as string[];
+    if (ids.length === 0) {
+      onClose();
+      return;
+    }
     db.collection("submissions")
       .where("assignment", "==", assignment._id)
       .where("student", "in", ids)
       .onSnapshot((querySnapshot) => {
         const submissions: Submissions[] = [];
-        //loop in ids and check if it's in querySnapshot
         let idsToDelete = [] as string[];
         ids.forEach((id) => {
           if (querySnapshot.docs.find((doc) => doc.data().student === id)) {
@@ -428,6 +431,8 @@ const useStyles = makeStyles((theme) => ({
   itemContainer: {
     display: "flex",
     flexDirection: "column",
+    alignItems: "flex-start",
+
     marginBottom: 16,
   },
   label: {

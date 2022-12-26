@@ -12,6 +12,7 @@ import { Assignments } from "../../../types/assignmentTypes";
 import { Courses } from "../../../types/courseTypes";
 import Loading from "../../Loading";
 import AddAssignmentDialog from "./AddAssignmentDialog";
+import GradesDialog from "./GradesDialog";
 import ObjectionsDialog from "./ObjectionsDialog";
 
 interface Props {
@@ -33,6 +34,11 @@ function CourseAssignments(props: Props) {
   const onObjectionView = (assignment: Assignments) => {
     setSelectedAssignment(assignment);
     openObjections();
+  };
+  const [grades, openGrades, closeGrades] = useBoolean();
+  const onGradesView = (assignment: Assignments) => {
+    setSelectedAssignment(assignment);
+    openGrades();
   };
   useEffect(() => {
     db.collection("assignments")
@@ -112,6 +118,29 @@ function CourseAssignments(props: Props) {
       sortable: false,
       disableColumnMenu: true,
     },
+    {
+      field: "grades",
+      headerName: "Grades",
+      renderCell(params) {
+        const assignment = assignments.find((a) => a._id === params.row._id);
+
+        return (
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => {
+              onGradesView(assignment!);
+            }}
+          >
+            View Grades
+          </Button>
+        );
+      },
+      width: 140,
+      align: "left",
+      sortable: false,
+      disableColumnMenu: true,
+    },
   ];
   if (assignments === null) return <Loading />;
   if (assignments.length === 0)
@@ -142,6 +171,16 @@ function CourseAssignments(props: Props) {
   return (
     <div className={classes.container}>
       <Dialog
+        open={grades}
+        onClose={closeGrades}
+        classes={{ paper: classes.gradeDialog }}
+      >
+        <GradesDialog
+          closeDialog={closeGrades}
+          assignment={selectedAssignment!}
+        />
+      </Dialog>
+      <Dialog
         open={objections}
         onClose={closeObjections}
         classes={{ paper: classes.objectionDialog }}
@@ -171,7 +210,7 @@ function CourseAssignments(props: Props) {
         Add Assignment
       </Fab>
       <div className={classes.contentContainer}>
-        <div style={{ height: "100%", width: 920, userSelect: "none" }}>
+        <div style={{ height: "100%", width: 1060, userSelect: "none" }}>
           <DataGrid
             rows={assignments}
             columns={columns}
@@ -201,6 +240,10 @@ const useStyles = makeStyles((theme) => ({
   },
   objectionDialog: {
     minWidth: 300,
+    padding: 16,
+  },
+  gradeDialog: {
+    minWidth: 500,
     padding: 16,
   },
   cell: {

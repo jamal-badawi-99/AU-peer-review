@@ -1,4 +1,4 @@
-import { ButtonBase, Typography } from "@material-ui/core";
+import { ButtonBase } from "@material-ui/core";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import React from "react";
 import { useNavigate } from "react-router-dom";
@@ -7,6 +7,8 @@ import { Courses } from "../../../types/courseTypes";
 import { useUser } from "../../../utils/UserContext";
 import Loading from "../../Loading";
 import HeaderWithButton from "../../Reusables/HeaderWithButton";
+import { scrollBarStyle } from "../../UserComponents/UserProfile";
+import { ItemWithLabel } from "./Dialogs/GradeOthersAssignmentDialog";
 
 export default React.memo(LecturerCourses);
 
@@ -37,25 +39,32 @@ function LecturerCourses() {
   return (
     <div className={classes.container}>
       <HeaderWithButton title="Courses" />
-      <div className={classes.content}>
+      <div
+        className={classes.content}
+        style={{
+          gridTemplateColumns: `repeat(${
+            courses.length > 3 ? 3 : courses.length
+          },300px)`,
+        }}
+      >
         {courses.map((course) => (
           <ButtonBase
             className={classes.courseContainer}
             key={course._id}
             onClick={() => navigate(`/student-courses/${course._id}`)}
           >
-            <Typography>{course.title}</Typography>
-            <Typography>{course.lecturerName}</Typography>
-            <Typography>
-              {course.students ? course.students.length : 0}
-            </Typography>
+            <ItemWithLabel label="Course Title" value={course.title} />
+            <ItemWithLabel label="Lecturer" value={course.lecturerName} />
+            <ItemWithLabel
+              label="Students count"
+              value={course.students ? course.students.length.toString() : "0"}
+            />
           </ButtonBase>
         ))}
       </div>
     </div>
   );
 }
-
 const useStyles = makeStyles((theme) => ({
   container: {
     display: "flex",
@@ -63,34 +72,25 @@ const useStyles = makeStyles((theme) => ({
     height: "100%",
     width: "100%",
     overflow: "hidden",
+    boxSizing: "border-box",
+    justifyContent: "flex-start",
+    alignItems: "center",
   },
   content: {
-    display: "flex",
-    flexDirection: "column",
-    // flexGrow: 1,
+    boxSizing: "border-box",
+    display: "grid",
+    ...scrollBarStyle,
+    gridGap: theme.spacing(2),
+
     overflow: "auto",
     paddingBlock: theme.spacing(2),
-
-    paddingInline: theme.spacing(64),
-
-    [theme.breakpoints.down("lg")]: {
-      paddingInline: theme.spacing(48),
-    },
-
-    [theme.breakpoints.down("md")]: {
-      paddingInline: theme.spacing(32),
-    },
-    [theme.breakpoints.down("sm")]: {
-      paddingInline: theme.spacing(16),
-    },
-    [theme.breakpoints.down("xs")]: {
-      paddingInline: theme.spacing(8),
-    },
   },
   courseContainer: {
     display: "flex",
     flexDirection: "column",
+    width: 300,
     alignItems: "flex-start",
+    justifyContent: "flex-start",
     padding: theme.spacing(2),
     border: "1px solid #e5e5e5",
     borderRadius: 4,
