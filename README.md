@@ -1,4 +1,4 @@
-# Ankara University Peer Review System
+# AU Peer Review System
 
 ##
 
